@@ -112,6 +112,13 @@ public class FullscreenActivity extends Activity {
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
         findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
+//        RandomInit randomInit=new RandomInit();
+        try {
+			int[][] TestArray=RandomInit.twoDimenArray(6,10, 10);
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		}
+        
     }
 
     @Override
