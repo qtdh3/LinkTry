@@ -43,6 +43,11 @@ public class Judgement {
 		printLocalStates(bigArray,"initBigArray bigarray 3");
 		
 	}
+	/**
+	 * @param blockPos1  point include x,y coordinate
+	 * @param blockPos2  point include x,y coordinate
+	 * @return Suceess or Failed ,可以从pathPosArray获取桥点坐标，坐标以大数组为准（bigArray）
+	 * */
 
 	public boolean judge(int[] blockPos1,int[] blockPos2) {
 		if (!checkInputVariable(blockPos1,blockPos2)) 
@@ -52,13 +57,20 @@ public class Judgement {
 		pathPosArray=null;
 		if (blockPos1[0]==blockPos2[0]||blockPos1[1]==blockPos2[1]) {
 			if (judgeLineClear(blockPos1,blockPos2)) {
-				//TODO   Case2:	
+				//TODO   Case1:	
 				pathPosArray=new int[]{LinkType1};
 				Log.e(Tag, "Finish judging-- "+"Case1:--pathPosArray.size="+pathPosArray);
-				
+				return true;
 			}else {
-				
 				//TODO   Case3: or  Fail
+				if(judgeTwoPointRectangle(blockPos1,blockPos2)){
+					Log.e(Tag, "Finish judging-- "+"Case3:"+pathPosArray[0]+","+pathPosArray[1]+" "+pathPosArray[2]+","+pathPosArray[3]);
+					return true;
+				}
+				else {
+					return false;
+				}
+				
 			}
 			
 		}
@@ -67,13 +79,127 @@ public class Judgement {
 			//TODO   Case2:	
 			pathPosArray=new int[]{pathPosArray[0],pathPosArray[1],LinkType2};
 			Log.e(Tag, "Finish judging-- "+"Case2:"+pathPosArray[0]+","+pathPosArray[1]);
+			return true;
 		}else {
 			//TODO   Case3: or  Fail
-			
+			if(judgeTwoPointCase(blockPos1,blockPos2)){
+				Log.e(Tag, "Finish judging-- "+"Case3:"+pathPosArray[0]+","+pathPosArray[1]+" "+pathPosArray[2]+","+pathPosArray[3]);
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
+	}
 
+	private boolean judgeTwoPointRectangle(int[] blockPos1, int[] blockPos2) {
+		if (blockPos1[0]==blockPos2[0]) {
+			for (int i = blockPos2[0]+1; i <bigArray.length; i++) {
+				int[] testPoint=new int[]{i, blockPos1[1]};
+				if (judgeOnePointCase(testPoint, blockPos2)) {
+					int[] pathCase3=new int[5];
+					System.arraycopy(testPoint, 0, pathCase3, 0, 2);
+					System.arraycopy(pathPosArray, 0, pathCase3, 2, 2);
+					pathCase3[4]=LinkType3;
+					pathPosArray=pathCase3; 
+					return true;
+				}
+			}
+			for (int i = blockPos2[0]-1; i >0; i--) {
+				int[] testPoint=new int[]{i, blockPos1[1]};
+				if (judgeOnePointCase(testPoint, blockPos2)) {
+					int[] pathCase3=new int[5];
+					System.arraycopy(testPoint, 0, pathCase3, 0, 2);
+					System.arraycopy(pathPosArray, 0, pathCase3, 2, 2);
+					pathCase3[4]=LinkType3;
+					pathPosArray=pathCase3; 
+					return true;
+				}
+			}
+		}else {
+			for (int i = blockPos2[1]+1; i <bigArray[0].length; i++) {
+				int[] testPoint=new int[]{blockPos1[0],i};
+				if (judgeOnePointCase(testPoint, blockPos2)) {
+					int[] pathCase3=new int[5];
+					System.arraycopy(testPoint, 0, pathCase3, 0, 2);
+					System.arraycopy(pathPosArray, 0, pathCase3, 2, 2);
+					pathCase3[4]=LinkType3;
+					pathPosArray=pathCase3; 
+					return true;
+				}
+			}
+			for (int i = blockPos2[1]-1; i >0; i--) {
+				int[] testPoint=new int[]{blockPos1[0],i};
+				if (judgeOnePointCase(testPoint, blockPos2)) {
+					int[] pathCase3=new int[5];
+					System.arraycopy(testPoint, 0, pathCase3, 0, 2);
+					System.arraycopy(pathPosArray, 0, pathCase3, 2, 2);
+					pathCase3[4]=LinkType3;
+					pathPosArray=pathCase3; 
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private boolean judgeTwoPointCase(int[] blockPos1, int[] blockPos2) {
+		// 从第二方向出发，寻找合适点
+		if (blockPos1[1]>blockPos2[1]) {
+			for (int i = blockPos2[1]+1; i < blockPos1[1]; i++) {
+				int[] testPoint=new int[]{ blockPos1[0],i};
+				if (judgeOnePointCase(testPoint, blockPos2)) {
+					int[] pathCase3=new int[5];
+					System.arraycopy(testPoint, 0, pathCase3, 0, 2);
+					System.arraycopy(pathPosArray, 0, pathCase3, 2, 2);
+					pathCase3[4]=LinkType3;
+					pathPosArray=pathCase3; 
+					return true;
+				}
+			}
+		}
+		else {
+			for (int i = blockPos1[1]+1; i < blockPos2[1]; i++) {
+				int[] testPoint=new int[]{ blockPos1[0],i};
+				if (judgeOnePointCase(testPoint, blockPos2)) {
+					int[] pathCase3=new int[5];
+					System.arraycopy(testPoint, 0, pathCase3, 0, 2);
+					System.arraycopy(pathPosArray, 0, pathCase3, 2, 2);
+					pathCase3[4]=LinkType3;
+					pathPosArray=pathCase3; 
+					return true;
+				}
+			}
+		}
 		
-		return false; 
+		//  从第一方向出发，寻找合适点
+		if (blockPos1[0]>blockPos2[0]) {
+			for (int i = blockPos2[0]+1; i < blockPos1[0]; i++) {
+				int[] testPoint=new int[]{i, blockPos1[1]};
+				if (judgeOnePointCase(testPoint, blockPos2)) {
+					int[] pathCase3=new int[5];
+					System.arraycopy(testPoint, 0, pathCase3, 0, 2);
+					System.arraycopy(pathPosArray, 0, pathCase3, 2, 2);
+					pathCase3[4]=LinkType3;
+					pathPosArray=pathCase3; 
+					return true;
+				}
+			}
+		}
+		else {
+			for (int i = blockPos1[0]+1; i < blockPos2[0]; i++) {
+				int[] testPoint=new int[]{i, blockPos1[1]};
+				if (judgeOnePointCase(testPoint, blockPos2)) {
+					int[] pathCase3=new int[5];
+					System.arraycopy(testPoint, 0, pathCase3, 0, 2);
+					System.arraycopy(pathPosArray, 0, pathCase3, 2, 2);
+					pathCase3[4]=LinkType3;
+					pathPosArray=pathCase3; 
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	private boolean judgeLineClear(int[] blockPos1, int[] blockPos2) {
