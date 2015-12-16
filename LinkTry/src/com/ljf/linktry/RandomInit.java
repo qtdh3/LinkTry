@@ -10,13 +10,13 @@ public class RandomInit {
 	public static final String Tag="RandomInit";
 
 	/**
-	 * @author JF-066
+	 *  @author JF-066
 	 * 
-	 * @return ·µ»ØÒ»¸öËæ»úÊı¾İ
+	 * @return è¿”å›ä¸€ä¸ªéšæœºæ•°æ®
 	 * 
-	 * @param x_dimen x·½ÏòÉÏÊı¾İ¸öÊı
-	 * @param y_dimen y·½ÏòÉÏÊı¾İ¸öÊı
-	 * @param style_num Í¼ĞÎÑùÊ½µÄ¸öÊı
+	 * @param x_dimen xæ–¹å‘ä¸Šæ•°æ®ä¸ªæ•°
+	 * @param y_dimen yæ–¹å‘ä¸Šæ•°æ®ä¸ªæ•°
+	 * @param style_num å›¾å½¢æ ·å¼çš„ä¸ªæ•°
 	 * */
 	static int[][] twoDimenArray(int x_dimen,int y_dimen,int style_num){
 		
