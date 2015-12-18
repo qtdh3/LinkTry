@@ -116,7 +116,10 @@ public class FullscreenActivity extends Activity {
         try {
 			int[][] TestArray=RandomInit.twoDimenArray(6,10, 10);
 			Judgement judgement=new Judgement(TestArray);
-			judgement.judge(new int[]{3,5} ,new int[] {5,7});
+//			judgement.judge(new int[]{3,5} ,new int[] {4,5});
+			judgement.judge(new int[]{3,5} ,new int[] {5,5});
+			judgement.judge(new int[]{0,1} ,new int[] {0,4});
+			judgement.judge(new int[]{5,9} ,new int[] {5,3});
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		}
