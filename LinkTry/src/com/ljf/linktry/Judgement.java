@@ -51,15 +51,18 @@ public class Judgement {
 
 	public boolean judge(int[] blockPosition1,int[] blockPosition2) {			//判断的一个注意点，   大小数组矩阵的转换 ，都放在最后一步，如 clear的判断
 																	// 由于具体判断时不仅有用到大矩阵，还用到小矩阵，所以，最终方块消掉了以后要同时更新大矩阵与小矩阵
-		if (!checkInputVariable(blockPosition1,blockPosition2)) 
+		int[] blockPos1=new int[]{blockPosition1[0]+1,blockPosition1[1]+1};
+		int[] blockPos2=new int[]{blockPosition2[0]+1,blockPosition2[1]+1};
+		Log.e(Tag, "------ Two Points'value Print|"+bigArray[blockPos1[0]][blockPos1[1]]+","+bigArray[blockPos2[0]][blockPos2[1]]);
+		
+		if (!checkInputVariable(blockPos1,blockPos2)) 
 			throw new IllegalArgumentException("Input Arrays is Wrong");
 		
 //		printLocalStates(bigArray,"judge bigArray_now");
-		Log.e(Tag, "Two Points'value Print|"+smallArray[blockPosition1[0]][blockPosition1[1]]+","+smallArray[blockPosition2[0]][blockPosition2[1]]);
+		
 		
 		pathPosArray=null;
-		int[] blockPos1=new int[]{blockPosition1[0]+1,blockPosition1[1]+1};
-		int[] blockPos2=new int[]{blockPosition2[0]+1,blockPosition2[1]+1};
+		
 		if (blockPos1[0]==blockPos2[0]||blockPos1[1]==blockPos2[1]) {
 			if (judgeLineClear(blockPos1,blockPos2)) {
 				//TODO   Case1:	
@@ -68,7 +71,7 @@ public class Judgement {
 				return true;
 			}else {
 				//TODO   Case3: or  Fail
-				if(judgeTwoPointRectangle(blockPos1,blockPos2)){
+				if(judgeTwoPointCase(blockPos1,blockPos2)){
 					Log.e(Tag, "Finish judging-- "+"Case3:"+pathPosArray[0]+","+pathPosArray[1]+" "+pathPosArray[2]+","+pathPosArray[3]);
 					return true;
 				}
@@ -101,180 +104,162 @@ public class Judgement {
 		}
 	}
 
-	private boolean judgeTwoPointRectangle(int[] blockPos1, int[] blockPos2) {
-		//TODO  改为用大矩阵，保证能取到外框边
-		Log.e(Tag, "judgeTwoPointRectangle");
-		if (blockPos1[0]==blockPos2[0]) {
-			for (int i = blockPos2[0]+1; i <bigArray.length-1; i++) {
-				int[] testPoint=new int[]{i, blockPos1[1]};
-				if (!isEmpty(testPoint)) {
-					break;
-				}
-				if (!judgeLineClear(testPoint, blockPos1)) {
-					break;
-				}
-				if (judgeOnePointCase(testPoint, blockPos2)) {
-					int[] pathCase3=new int[5];
-					System.arraycopy(testPoint, 0, pathCase3, 0, 2);
-					System.arraycopy(pathPosArray, 0, pathCase3, 2, 2);
-					pathCase3[4]=LinkType3;
-					pathPosArray=pathCase3; 
-					return true;
-				}
-			}
-			for (int i = blockPos2[0]-1; i >=0; i--) {
-				int[] testPoint=new int[]{i, blockPos1[1]};
-				if (!isEmpty(testPoint)) {
-					break;
-				}
-				if (!judgeLineClear(testPoint, blockPos1)) {
-					break;
-				}
-				if (judgeOnePointCase(testPoint, blockPos2)) {
-					int[] pathCase3=new int[5];
-					System.arraycopy(testPoint, 0, pathCase3, 0, 2);
-					System.arraycopy(pathPosArray, 0, pathCase3, 2, 2);
-					pathCase3[4]=LinkType3;
-					pathPosArray=pathCase3; 
-					return true;
-				}
-			}
-		}else {
-			for (int i = blockPos2[1]+1; i <smallArray[0].length+1; i++) {
-				int[] testPoint=new int[]{blockPos1[0],i};
-				if (!isEmpty(testPoint)) {
-					break;
-				}
-				if (!judgeLineClear(testPoint, blockPos1)) {
-					break;
-				}
-				if (judgeOnePointCase(testPoint, blockPos2)) {
-					int[] pathCase3=new int[5];
-					System.arraycopy(testPoint, 0, pathCase3, 0, 2);
-					System.arraycopy(pathPosArray, 0, pathCase3, 2, 2);
-					pathCase3[4]=LinkType3;
-					pathPosArray=pathCase3; 
-					return true;
-				}
-			}
-			for (int i = blockPos2[1]-1; i >=0; i--) {
-				int[] testPoint=new int[]{blockPos1[0],i};
-				if (!isEmpty(testPoint)) {
-					break;
-				}
-				if (!judgeLineClear(testPoint, blockPos1)) {
-					break;
-				}
-				if (judgeOnePointCase(testPoint, blockPos2)) {
-					int[] pathCase3=new int[5];
-					System.arraycopy(testPoint, 0, pathCase3, 0, 2);
-					System.arraycopy(pathPosArray, 0, pathCase3, 2, 2);
-					pathCase3[4]=LinkType3;
-					pathPosArray=pathCase3; 
-					return true;
-				}
-			}
-		}
-		return false;
-	}
+//	private boolean judgeTwoPointRectangle(int[] blockPos1, int[] blockPos2) {
+//		//TODO  改为用大矩阵，保证能取到外框边
+//		Log.e(Tag, "judgeTwoPointRectangle");
+//		if (blockPos1[0]==blockPos2[0]) {
+//			for (int i = blockPos2[0]+1; i <bigArray.length; i++) {
+//				int[] testPoint=new int[]{i, blockPos1[1]};
+//				boolean canBreak=false;
+//				if (isBridgePoint(testPoint,blockPos1,blockPos2,canBreak)) {
+//					return true;
+//				}else {
+//					if (canBreak) {
+//						break;
+//					}
+//				}
+//			}
+//			for (int i = blockPos2[0]-1; i >=0; i--) {
+//				int[] testPoint=new int[]{i, blockPos1[1]};
+//				boolean canBreak=false;
+//				if (isBridgePoint(testPoint,blockPos1,blockPos2,canBreak)) {
+//					return true;
+//				}else {
+//					if (canBreak) {
+//						break;
+//					}
+//				}
+//			}
+//		}else {
+//			for (int i = blockPos2[1]+1; i <bigArray[0].length; i++) {
+//				int[] testPoint=new int[]{blockPos1[0],i};
+//				boolean canBreak=false;
+//				if (isBridgePoint(testPoint,blockPos1,blockPos2,canBreak)) {
+//					return true;
+//				}else {
+//					if (canBreak) {
+//						break;
+//					}
+//				}
+//			}
+//			for (int i = blockPos2[1]-1; i >=0; i--) {
+//				int[] testPoint=new int[]{blockPos1[0],i};
+//				boolean canBreak=false;
+//				if (isBridgePoint(testPoint,blockPos1,blockPos2,canBreak)) {
+//					return true;
+//				}else {
+//					if (canBreak) {
+//						break;
+//					}
+//				}
+//			}
+//		}
+//		return false;
+//	}
 
-	private boolean isEmpty(int[] testPoint) {
-		if (testPoint.length==2) 
-			throw new IllegalArgumentException("int Array's length is wrong");
-		if (bigArray[testPoint[0]][testPoint[1]]!=0) {
+	private boolean isBridgePoint(int[] testPoint, int[] blockPos1,int[] blockPos2,boolean canBreak) {
+		if (!isEmpty(testPoint)) {
+			canBreak=true;
+			return false;
+		}
+		if (!judgeLineClear(testPoint, blockPos1)) {
+			canBreak=true;
+			return false;
+		}	
+		if (judgeOnePointCase(testPoint, blockPos2)) {
+			int[] pathCase3=new int[5];
+			System.arraycopy(testPoint, 0, pathCase3, 0, 2);
+			System.arraycopy(pathPosArray, 0, pathCase3, 2, 2);
+			pathCase3[4]=LinkType3;
+			pathPosArray=pathCase3; 
 			return true;
 		}
 		return false;
 	}
 
 	private boolean judgeTwoPointCase(int[] blockPos1, int[] blockPos2) {		//  先跟据测试点与点1的判断决定循环是否继续走下去，包括对测试点是否为空的判断，测试点从靠近点1开始取
-		//TODO  改为用大矩阵，保证能取到外框边
-		// 从第二方向出发，寻找合适点
-		if (blockPos1[1]>blockPos2[1]) {
-			for (int i = blockPos1[1]-1; i > blockPos2[1]; i--) {
-//			for (int i = blockPos2[1]+1; i < blockPos1[1]; i++) {
-				int[] testPoint=new int[]{ blockPos1[0],i};
-				if (smallArray[testPoint[0]][testPoint[1]]!=0) {
-					break;
-				}
-				if (!judgeLineClear(testPoint, blockPos1)) {
-					break;
-				}
-				
-				if (judgeOnePointCase(testPoint, blockPos2)) {
-					int[] pathCase3=new int[5];
-					System.arraycopy(testPoint, 0, pathCase3, 0, 2);
-					System.arraycopy(pathPosArray, 0, pathCase3, 2, 2);
-					pathCase3[4]=LinkType3;
-					pathPosArray=pathCase3; 
-					return true;
-				}
-			}
-		}
-		else {
-			for (int i = blockPos1[1]+1; i < blockPos2[1]; i++) {
-				int[] testPoint=new int[]{ blockPos1[0],i};
-				if (smallArray[testPoint[0]][testPoint[1]]!=0) {
-					break;
-				}
-				if (!judgeLineClear(testPoint, blockPos1)) {
-					break;
-				}
-				if (judgeOnePointCase(testPoint, blockPos2)) {
-					int[] pathCase3=new int[5];
-					System.arraycopy(testPoint, 0, pathCase3, 0, 2);
-					System.arraycopy(pathPosArray, 0, pathCase3, 2, 2);
-					pathCase3[4]=LinkType3;
-					pathPosArray=pathCase3; 
-					return true;
-				}
-			}
-		}
-		
-		//  从第一方向出发，寻找合适点
-		if (blockPos1[0]>blockPos2[0]) {
-			for (int i =blockPos1[0]-1; i > blockPos2[0]; i--) {
-//			for (int i = blockPos2[0]+1; i < blockPos1[0]; i++) {
-				
+		Log.e(Tag, "judgeTwoPointCase");
+		if (blockPos1[1]!=blockPos2[1])
+		{
+			for (int i = blockPos2[0]+1; i <bigArray.length; i++) {
 				int[] testPoint=new int[]{i, blockPos1[1]};
-				if (smallArray[testPoint[0]][testPoint[1]]!=0) {
-					break;
-				}
-				if (!judgeLineClear(testPoint, blockPos1)) {
-					break;
-				}
-				if (judgeOnePointCase(testPoint, blockPos2)) {
-					int[] pathCase3=new int[5];
-					System.arraycopy(testPoint, 0, pathCase3, 0, 2);
-					System.arraycopy(pathPosArray, 0, pathCase3, 2, 2);
-					pathCase3[4]=LinkType3;
-					pathPosArray=pathCase3; 
+				boolean canBreak=false;
+				if (isBridgePoint(testPoint,blockPos1,blockPos2,canBreak)) {
 					return true;
+				}else {
+					if (canBreak) {
+						break;
+					}
+				}
+			}
+			for (int i = blockPos2[0]-1; i >=0; i--) {
+				int[] testPoint=new int[]{i, blockPos1[1]};
+				boolean canBreak=false;
+				if (isBridgePoint(testPoint,blockPos1,blockPos2,canBreak)) {
+					return true;
+				}else {
+					if (canBreak) {
+						break;
+					}
 				}
 			}
 		}
-		else {
-			for (int i = blockPos1[0]+1; i < blockPos2[0]; i++) {
-				int[] testPoint=new int[]{i, blockPos1[1]};
-				if (smallArray[testPoint[0]][testPoint[1]]!=0) {
-					break;
-				}
-				if (!judgeLineClear(testPoint, blockPos1)) {
-					break;
-				}
-				if (judgeOnePointCase(testPoint, blockPos2)) {
-					int[] pathCase3=new int[5];
-					System.arraycopy(testPoint, 0, pathCase3, 0, 2);
-					System.arraycopy(pathPosArray, 0, pathCase3, 2, 2);
-					pathCase3[4]=LinkType3;
-					pathPosArray=pathCase3; 
+		if (blockPos1[0]!=blockPos2[0]) {
+			for (int i = blockPos2[1]+1; i <bigArray[0].length; i++) {
+				int[] testPoint=new int[]{blockPos1[0],i};
+				boolean canBreak=false;
+				if (isBridgePoint(testPoint,blockPos1,blockPos2,canBreak)) {
 					return true;
+				}else {
+					if (canBreak) {
+						break;
+					}
+				}
+			}
+			for (int i = blockPos2[1]-1; i >=0; i--) {
+				int[] testPoint=new int[]{blockPos1[0],i};
+				boolean canBreak=false;
+				if (isBridgePoint(testPoint,blockPos1,blockPos2,canBreak)) {
+					return true;
+				}else {
+					if (canBreak) {
+						break;
+					}
 				}
 			}
 		}
 		return false;
 	}
 
+	private boolean judgeOnePointCase(int[] blockPos1, int[] blockPos2) {
+		if (blockPos1[0]==blockPos2[0]||blockPos1[1]==blockPos2[1]) {
+			throw new IllegalArgumentException("Do not at Different Lines");
+		}
+		
+		int[] BridePoint1=new int[]{blockPos1[0],blockPos2[1]};
+		int[] BridePoint2=new int[]{blockPos2[0],blockPos1[1]};
+		
+		if (isEmpty(BridePoint1)) {
+			if (judgeLineClear(blockPos1, BridePoint1)) {
+				if (judgeLineClear(blockPos2, BridePoint1)) 
+				{
+					pathPosArray=BridePoint1;
+					return true;
+				}
+			}
+		}
+		if (isEmpty(BridePoint2)) {
+			if (judgeLineClear(blockPos1, BridePoint2)) {
+				if(judgeLineClear(blockPos2, BridePoint2))
+				{
+					pathPosArray=BridePoint2;
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	private boolean judgeLineClear(int[] blockPos1, int[] blockPos2) {	
 		if (blockPos1[0]==blockPos2[0]) {
 			if (blockPos1[1]>blockPos2[1]) {
@@ -282,7 +267,7 @@ public class Judgement {
 					return true;
 				}
 				for (int i = blockPos2[1]+1; i < blockPos1[1]; i++) {
-					if (bigArray[blockPos1[0]][i]!=0) {				//Have transform smallArray into bigArray's coordinate
+					if (bigArray[blockPos1[0]][i]!=0) {			
 						return false;
 					}
 				}
@@ -333,45 +318,17 @@ public class Judgement {
 		}
 	}
 
-	private boolean judgeOnePointCase(int[] blockPos1, int[] blockPos2) {
-		if (blockPos1[0]==blockPos2[0]||blockPos1[1]==blockPos2[1]) {
-			throw new IllegalArgumentException("Do not at Different Lines");
-		}
-		
-		int[] BridePoint1=new int[]{blockPos1[0],blockPos2[1]};
-		int[] BridePoint2=new int[]{blockPos2[0],blockPos1[1]};
-		
-		if (judgeLineClear(blockPos1, BridePoint1)) {
-			if (judgeLineClear(blockPos2, BridePoint1)) 
-			{
-				pathPosArray=BridePoint1;
-				return true;
-			}
-			else
-				return false;
-		}else if (judgeLineClear(blockPos1, BridePoint2)) {
-			if(judgeLineClear(blockPos2, BridePoint2))
-			{
-				pathPosArray=BridePoint2;
-				return true;
-			}
-			else {
-				return false;
-			}
-		}
-		else {
-			return false;
-		}
-	}
-
 	private boolean checkInputVariable(int[] blockPos1, int[] blockPos2) {
 		if (blockPos1.length==2&&blockPos2.length==2) 
 		{
 			if (blockPos1[0]==blockPos2[0]&&blockPos1[1]==blockPos2[1]) {
 				return false;
 			}
-			if (blockPos1[0]>=xDimenLength||blockPos2[0]>=xDimenLength
-					||blockPos1[1]>=yDimenLength||blockPos2[1]>=yDimenLength) {
+			if (blockPos1[0]>=(xDimenLength+1)||blockPos2[0]>=(xDimenLength+1)
+					||blockPos1[1]>=(yDimenLength+1)||blockPos2[1]>=(yDimenLength+1)) {
+				return false;
+			}
+			if (isEmpty(blockPos1)||isEmpty(blockPos2)) {
 				return false;
 			}
 			return true;
@@ -388,12 +345,23 @@ public class Judgement {
 			sb.append("\n");
 			for(int j=0;j<Array[i].length;j++){
 				sb.append( Array[i][j]);
-				sb.append(" ");
+				sb.append("  ");
 			}
 			
 		}
 		Log.e(Tag,hintString+"  ArrayPrint:"+ sb.toString());
 		
+	}
+	
+	private boolean isEmpty(int[] testPoint) {
+		if (testPoint.length!=2) 
+			throw new IllegalArgumentException("int Array's length is wrong");
+		Log.e(Tag, "bigArray[testPoint[0]][testPoint[1]]="+bigArray[testPoint[0]][testPoint[1]]);
+		if (bigArray[testPoint[0]][testPoint[1]]==0) {
+			Log.e(Tag, "isEmpty");			
+			return true;
+		}
+		return false;
 	}
 	
 }

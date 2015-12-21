@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -112,17 +113,35 @@ public class FullscreenActivity extends Activity {
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
         findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
-        
-        try {
-			int[][] TestArray=RandomInit.twoDimenArray(6,10, 10);
-			Judgement judgement=new Judgement(TestArray);
-//			judgement.judge(new int[]{3,5} ,new int[] {4,5});
-			judgement.judge(new int[]{3,5} ,new int[] {5,5});
-			judgement.judge(new int[]{0,1} ,new int[] {0,4});
-			judgement.judge(new int[]{5,9} ,new int[] {5,3});
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		}
+        new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				 try {
+						int[][] TestArray=RandomInit.twoDimenArray(6,10, 10);
+						TestArray[3][4]=0;
+						TestArray[3][5]=0;
+						TestArray[4][5]=0;
+						TestArray[5][5]=0;
+						TestArray[5][4]=0;
+						
+						Judgement judgement=new Judgement(TestArray);
+//						judgement.judge(new int[]{3,5} ,new int[] {4,5});
+//						judgement.judge(new int[]{3,5} ,new int[] {5,5});
+						judgement.judge(new int[]{3,3} ,new int[] {5,3});
+//						judgement.judge(new int[]{4,3} ,new int[] {5,6});
+						judgement.judge(new int[]{0,1} ,new int[] {0,4});
+						judgement.judge(new int[]{5,9} ,new int[] {5,3});
+						judgement.judge(new int[]{1,0} ,new int[] {5,0});
+						judgement.judge(new int[]{1,9} ,new int[] {5,9});
+					} catch (IllegalArgumentException e) {
+						Log.e("MainActivity", "IllegalArgumentException");
+						e.printStackTrace();
+					} 
+			}
+		}).start();
+       
     }
 
     @Override
