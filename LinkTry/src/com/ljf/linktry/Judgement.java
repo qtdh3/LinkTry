@@ -156,7 +156,43 @@ public class Judgement {
 //		}
 //		return false;
 //	}
-
+	/**
+	 * @param blockPosition1        the coordinate want to remove
+	 * @param blockPosition2        the coordinate want to remove
+	 * @return if the input variables do not have any problem ,return turn 
+	 * */
+	public boolean removeBlocks(int[] blockPosition1,int[] blockPosition2){
+		if (!checkInputVariable(blockPosition1, blockPosition2)) {
+			throw new IllegalArgumentException("can not remove those coordinate");
+		}
+		else {
+			smallArray[blockPosition1[0]][blockPosition1[1]]=0;
+			bigArray[blockPosition1[0]+1][blockPosition1[1]+1]=0;
+			smallArray[blockPosition2[0]][blockPosition2[1]]=0;
+			bigArray[blockPosition2[0]+1][blockPosition2[1]+1]=0;
+		}
+		return true;
+	}
+	
+	
+	/**
+	 * @param blockPosition1        the coordinate want to judge
+	 * @param blockPosition2        the coordinate want to judge
+	 * @return if the input variables do not have any problem ,return turn 
+	 * */
+	public boolean judgeStyle(int[] blockPosition1,int[] blockPosition2){
+		if (!checkInputVariable(blockPosition1, blockPosition2)) {
+			throw new IllegalArgumentException("can not remove those coordinate");
+		}
+		else {
+			if (smallArray[blockPosition1[0]][blockPosition1[1]]==smallArray[blockPosition2[0]][blockPosition2[1]]) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	
 	private boolean isBridgePoint(int[] testPoint, int[] blockPos1,int[] blockPos2,boolean canBreak) {
 		if (!isEmpty(testPoint)) {
 			canBreak=true;

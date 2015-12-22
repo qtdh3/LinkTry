@@ -127,14 +127,10 @@ public class FullscreenActivity extends Activity {
 						TestArray[5][4]=0;
 						
 						Judgement judgement=new Judgement(TestArray);
-//						judgement.judge(new int[]{3,5} ,new int[] {4,5});
-//						judgement.judge(new int[]{3,5} ,new int[] {5,5});
 						judgement.judge(new int[]{3,3} ,new int[] {5,3});
-//						judgement.judge(new int[]{4,3} ,new int[] {5,6});
-						judgement.judge(new int[]{0,1} ,new int[] {0,4});
-						judgement.judge(new int[]{5,9} ,new int[] {5,3});
-						judgement.judge(new int[]{1,0} ,new int[] {5,0});
-						judgement.judge(new int[]{1,9} ,new int[] {5,9});
+//						judgement.judge(new int[]{5,9} ,new int[] {5,3});
+//						judgement.judge(new int[]{1,0} ,new int[] {5,0});
+//						judgement.judge(new int[]{1,9} ,new int[] {5,9});
 					} catch (IllegalArgumentException e) {
 						Log.e("MainActivity", "IllegalArgumentException");
 						e.printStackTrace();
