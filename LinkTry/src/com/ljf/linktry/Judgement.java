@@ -1,8 +1,5 @@
 package com.ljf.linktry;
 
-import java.util.ArrayList;
-
-import android.R.integer;
 import android.util.Log;
 
 public class Judgement {
@@ -53,7 +50,7 @@ public class Judgement {
 																	// 由于具体判断时不仅有用到大矩阵，还用到小矩阵，所以，最终方块消掉了以后要同时更新大矩阵与小矩阵
 		int[] blockPos1=new int[]{blockPosition1[0]+1,blockPosition1[1]+1};
 		int[] blockPos2=new int[]{blockPosition2[0]+1,blockPosition2[1]+1};
-		Log.e(Tag, "------ Two Points'value Print|"+bigArray[blockPos1[0]][blockPos1[1]]+","+bigArray[blockPos2[0]][blockPos2[1]]);
+//		Log.e(Tag, "------ Two Points'value Print|"+bigArray[blockPos1[0]][blockPos1[1]]+","+bigArray[blockPos2[0]][blockPos2[1]]);
 		
 		if (!checkInputVariable(blockPos1,blockPos2)) 
 			throw new IllegalArgumentException("Input Arrays is Wrong");
@@ -214,7 +211,7 @@ public class Judgement {
 	}
 
 	private boolean judgeTwoPointCase(int[] blockPos1, int[] blockPos2) {		//  先跟据测试点与点1的判断决定循环是否继续走下去，包括对测试点是否为空的判断，测试点从靠近点1开始取
-		Log.e(Tag, "judgeTwoPointCase");
+//		Log.e(Tag, "judgeTwoPointCase");
 		if (blockPos1[1]!=blockPos2[1])
 		{
 			for (int i = blockPos2[0]+1; i <bigArray.length; i++) {
@@ -391,10 +388,10 @@ public class Judgement {
 	
 	private boolean isEmpty(int[] testPoint) {
 		if (testPoint.length!=2) 
-			throw new IllegalArgumentException("int Array's length is wrong");
+//			throw new IllegalArgumentException("int Array's length is wrong");
 		Log.e(Tag, "bigArray[testPoint[0]][testPoint[1]]="+bigArray[testPoint[0]][testPoint[1]]);
 		if (bigArray[testPoint[0]][testPoint[1]]==0) {
-			Log.e(Tag, "isEmpty");			
+//			Log.e(Tag, "isEmpty");			
 			return true;
 		}
 		return false;

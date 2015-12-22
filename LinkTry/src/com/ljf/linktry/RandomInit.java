@@ -2,8 +2,6 @@ package com.ljf.linktry;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-
 import android.util.Log;
 
 public class RandomInit {
@@ -73,14 +71,14 @@ public class RandomInit {
 		List<Integer> remainNum=new ArrayList<Integer>();
 		
 		for(int i=0;i<Num;i++){
-			remainNum.add(new Integer(i));
+			remainNum.add(Integer.valueOf(i));
 		}
 		for(int i=0;i<Num;i++){
 			int randomNum=(int)(Math.random()*(Num-i));
 			resultArray[i]=remainNum.get(randomNum);
 			remainNum.remove(randomNum);
 		}
-		Log.e(Tag, "remainNum--size:"+remainNum.size());
+//		Log.e(Tag, "remainNum--size:"+remainNum.size());
 		return resultArray;
 		
 	}

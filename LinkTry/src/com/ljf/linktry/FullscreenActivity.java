@@ -2,14 +2,25 @@ package com.ljf.linktry;
 
 import com.ljf.linktry.util.SystemUiHider;
 
+import android.R.color;
+import android.R.integer;
 import android.annotation.TargetApi;
+import android.app.ActionBar.LayoutParams;
 import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -54,6 +65,8 @@ public class FullscreenActivity extends Activity {
 
         final View controlsView = findViewById(R.id.fullscreen_content_controls);
         final View contentView = findViewById(R.id.fullscreen_content);
+        
+        final LinearLayout main_Layout=(LinearLayout) findViewById(R.id.main_page_part);
 
         // Set up an instance of SystemUiHider to control the system UI for
         // this activity.
@@ -113,34 +126,123 @@ public class FullscreenActivity extends Activity {
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
         findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
-        new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				// TODO Auto-generated method stub
-				 try {
-						int[][] TestArray=RandomInit.twoDimenArray(6,10, 10);
-						TestArray[3][4]=0;
-						TestArray[3][5]=0;
-						TestArray[4][5]=0;
-						TestArray[5][5]=0;
-						TestArray[5][4]=0;
-						
-						Judgement judgement=new Judgement(TestArray);
-						judgement.judge(new int[]{3,3} ,new int[] {5,3});
-//						judgement.judge(new int[]{5,9} ,new int[] {5,3});
-//						judgement.judge(new int[]{1,0} ,new int[] {5,0});
-//						judgement.judge(new int[]{1,9} ,new int[] {5,9});
-					} catch (IllegalArgumentException e) {
-						Log.e("MainActivity", "IllegalArgumentException");
-						e.printStackTrace();
-					} 
-			}
-		}).start();
+        
+        int[][] TestArray=new int[6][10];
+        TableLayout tableLayout=  initBlocksView(TestArray);
+        main_Layout.addView(tableLayout);
+        
+//        LinearLayout linearLayout=new LinearLayout(this);
+//        LinearLayout.LayoutParams layoutParams=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 400);
+////        layoutParams.height=200;
+////        layoutParams.width=50;
+//        linearLayout.setLayoutParams(layoutParams);
+//        linearLayout.setBackgroundColor(color.holo_blue_light);
+        TextView textView=new TextView(this);
+        LinearLayout.LayoutParams lP=  new LinearLayout.LayoutParams(-1, 400);
+        lP.height=400;
+        lP.setMargins(15, 15, 15, 15);
+        textView.setLayoutParams(lP);
+        
+        textView.setBackgroundColor(getResources().getColor(com.ljf.linktry.R.color.black_overlay));
+        textView.setText("I am Here");
+        textView.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL);
+//        textView.setHeight(100);     //该句有效  ，不过在上述LayoutParams 存在时无效
+        main_Layout.addView(textView);
+        
+//       View view=  LayoutInflater.from(this).inflate(R.layout.testtv, null);
+//       TextView tView=(TextView) view.findViewById(R.id.test_tv);
+//       LinearLayout.LayoutParams lP=  new LinearLayout.LayoutParams(-1,-1);
+//       lP.height=200;
+//       tView.setLayoutParams(lP);
+//       tView.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL); 
+//       main_Layout.addView(tView);
+       
+        
+        
+//        
+//        
+//        new Thread(new Runnable() {
+//			
+//			@Override
+//			public void run() {
+//				// TODO Auto-generated method stub
+//				 try {
+//						int[][] TestArray=RandomInit.twoDimenArray(6,10, 10);
+//						TestArray[3][4]=0;
+//						TestArray[3][5]=0;
+//						TestArray[4][5]=0;
+//						TestArray[5][5]=0;
+//						TestArray[5][4]=0;
+//						
+//						Judgement judgement=new Judgement(TestArray);
+//						judgement.judge(new int[]{3,3} ,new int[] {5,3});
+////						judgement.judge(new int[]{5,9} ,new int[] {5,3});
+////						judgement.judge(new int[]{1,0} ,new int[] {5,0});
+////						judgement.judge(new int[]{1,9} ,new int[] {5,9});
+//					} catch (IllegalArgumentException e) {
+//						Log.e("MainActivity", "IllegalArgumentException");
+//						e.printStackTrace();
+//					} 
+//			}
+//		}).start();
        
     }
 
-    @Override
+
+	private TableLayout initBlocksView(int[][] testArray) {
+		// TODO Auto-generated method stub
+		int x_dimen,y_dimen;
+		TableLayout tableLayout=new TableLayout(this);
+		
+		x_dimen=testArray.length+2;
+		y_dimen=testArray[0].length+2;
+		DisplayMetrics DM = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(DM);
+		int x_pixel=DM.widthPixels-100;
+		int y_pixel=DM.heightPixels-400;
+		int x_per=x_pixel/x_dimen-50;
+		int y_per=y_pixel/y_dimen-50;
+		for (int i = 0; i < y_dimen; i++) {
+			
+			TableRow tableRow=new TableRow(this);
+			for (int j = 0; j < x_dimen; j++) {
+				Button button=new Button(this);
+				button.setId(j*10+i);
+				
+//				android.view.ViewGroup.LayoutParams layoutParams= button.getLayoutParams();
+				
+				TableRow.LayoutParams layoutParams=new TableRow.LayoutParams(x_per, y_per);
+//				layoutParams.height=y_per;
+//				layoutParams.width=x_per;
+				button.setLayoutParams(layoutParams);
+//				
+				float invisible=0.1f;
+				if (j==0||j==x_dimen-1||i==0||i==y_dimen-1) {
+					button.setAlpha(invisible);
+				}else {
+					button.setAlpha(1);
+				}
+				tableRow.addView(button);
+			}
+			tableLayout.setShrinkAllColumns(true);
+			tableLayout.addView(tableRow);
+			
+		}
+		/*
+		 * 一点疑惑 ，为什么代码的设置很多都不能生效，到底什么原因，怎么解决
+		 * 为什么不接受Android自带的color ，非要资源目录下的color
+		 * */
+		LinearLayout.LayoutParams lParams=new LinearLayout.LayoutParams(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+//		lParams.gravity=Gravity.CENTER;             //代码的优先级高于 xml文件
+		lParams.setMargins(5, 15, 5, 5);
+		tableLayout.setLayoutParams(lParams);
+		tableLayout.setBackgroundColor(getResources().getColor(com.ljf.linktry.R.color.holo_green_light));
+		
+		return tableLayout;
+	}
+
+
+	@Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 

@@ -1,5 +1,8 @@
 <resources>
 
     <color name="black_overlay">#66000000</color>
+    
+    <!-- A light Holo shade of green -->
+    <color name="holo_green_light">#ff99cc00</color>
 
 </resources>
