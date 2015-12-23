@@ -7,6 +7,7 @@ import android.R.integer;
 import android.annotation.TargetApi;
 import android.app.ActionBar.LayoutParams;
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,6 +17,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
@@ -56,6 +58,10 @@ public class FullscreenActivity extends Activity {
      * The instance of the {@link SystemUiHider} for this activity.
      */
     private SystemUiHider mSystemUiHider;
+    private int[] lastBlockPos=null;
+    private Judgement judgement=null;
+    
+    private static final String Tag =  "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,32 +87,32 @@ public class FullscreenActivity extends Activity {
                     @Override
                     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
                     public void onVisibilityChange(boolean visible) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-                            // If the ViewPropertyAnimator API is available
-                            // (Honeycomb MR2 and later), use it to animate the
-                            // in-layout UI controls at the bottom of the
-                            // screen.
-                            if (mControlsHeight == 0) {
-                                mControlsHeight = controlsView.getHeight();
-                            }
-                            if (mShortAnimTime == 0) {
-                                mShortAnimTime = getResources().getInteger(
-                                        android.R.integer.config_shortAnimTime);
-                            }
-                            controlsView.animate()
-                                    .translationY(visible ? 0 : mControlsHeight)
-                                    .setDuration(mShortAnimTime);
-                        } else {
-                            // If the ViewPropertyAnimator APIs aren't
-                            // available, simply show or hide the in-layout UI
-                            // controls.
-                            controlsView.setVisibility(visible ? View.VISIBLE : View.GONE);
-                        }
-
-                        if (visible && AUTO_HIDE) {
-                            // Schedule a hide().
-                            delayedHide(AUTO_HIDE_DELAY_MILLIS);
-                        }
+//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+//                            // If the ViewPropertyAnimator API is available
+//                            // (Honeycomb MR2 and later), use it to animate the
+//                            // in-layout UI controls at the bottom of the
+//                            // screen.
+//                            if (mControlsHeight == 0) {
+//                                mControlsHeight = controlsView.getHeight();
+//                            }
+//                            if (mShortAnimTime == 0) {
+//                                mShortAnimTime = getResources().getInteger(
+//                                        android.R.integer.config_shortAnimTime);
+//                            }
+//                            controlsView.animate()
+//                                    .translationY(visible ? 0 : mControlsHeight)
+//                                    .setDuration(mShortAnimTime);
+//                        } else {
+//                            // If the ViewPropertyAnimator APIs aren't
+//                            // available, simply show or hide the in-layout UI
+//                            // controls.
+//                            controlsView.setVisibility(visible ? View.VISIBLE : View.GONE);
+//                        }
+//
+//                        if (visible && AUTO_HIDE) {
+//                            // Schedule a hide().
+//                            delayedHide(AUTO_HIDE_DELAY_MILLIS);
+//                        }
                     }
                 });
 
@@ -114,11 +120,11 @@ public class FullscreenActivity extends Activity {
         contentView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (TOGGLE_ON_CLICK) {
-                    mSystemUiHider.toggle();
-                } else {
-                    mSystemUiHider.show();
-                }
+//                if (TOGGLE_ON_CLICK) {
+//                    mSystemUiHider.toggle();
+//                } else {
+//                    mSystemUiHider.show();
+//                }
             }
         });
 
@@ -127,7 +133,8 @@ public class FullscreenActivity extends Activity {
         // while interacting with the UI.
         findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
         
-        int[][] TestArray=new int[6][10];
+        int[][] TestArray=RandomInit.twoDimenArray(8,12,8);
+        judgement=new Judgement(TestArray);
         TableLayout tableLayout=  initBlocksView(TestArray);
         main_Layout.addView(tableLayout);
         
@@ -165,7 +172,6 @@ public class FullscreenActivity extends Activity {
 //			
 //			@Override
 //			public void run() {
-//				// TODO Auto-generated method stub
 //				 try {
 //						int[][] TestArray=RandomInit.twoDimenArray(6,10, 10);
 //						TestArray[3][4]=0;
@@ -180,17 +186,53 @@ public class FullscreenActivity extends Activity {
 ////						judgement.judge(new int[]{1,0} ,new int[] {5,0});
 ////						judgement.judge(new int[]{1,9} ,new int[] {5,9});
 //					} catch (IllegalArgumentException e) {
-//						Log.e("MainActivity", "IllegalArgumentException");
+//						Log.e(Tag, "IllegalArgumentException");
 //						e.printStackTrace();
 //					} 
 //			}
 //		}).start();
        
     }
+    private View.OnClickListener onClickListener= new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+		     int btnId=	v.getId();
+		     int[] blockPosNow=new int[2];
+		     blockPosNow[0]=btnId/100;
+		     blockPosNow[1]=btnId%100;
+		     Log.e(Tag, "onClickListener:"+btnId);
+		     boolean isRight=false;
+		     if (lastBlockPos!=null) {
+		    	 if (lastBlockPos[0]!=blockPosNow[0]||lastBlockPos[1]!=blockPosNow[1]) {
+				    	try {
+				    		 if(judgement.judge(lastBlockPos ,blockPosNow)){
+					    		 Log.e(Tag, "路径判断结果为--成立");
+					    		 if (judgement.judgeStyle(lastBlockPos, blockPosNow)) {
+					    			 Log.e(Tag, "样式判断结果为--成立");
+					    			 judgement.removeBlocks(lastBlockPos, blockPosNow);
+					    			 v.setAlpha(0);
+					    			 View lastbtn=((View) v.getParent().getParent()).findViewById(lastBlockPos[0]*100+lastBlockPos[1]);
+					    			 lastbtn.setAlpha(0);
+					    			 isRight=true;	 }
+					    	 }
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+				}
+			}
+		    if (isRight) {
+				lastBlockPos=null;
+			}
+		    else {
+				lastBlockPos=blockPosNow;
+			}
+		     
+		}
+	};
 
 
 	private TableLayout initBlocksView(int[][] testArray) {
-		// TODO Auto-generated method stub
 		int x_dimen,y_dimen;
 		TableLayout tableLayout=new TableLayout(this);
 		
@@ -200,27 +242,55 @@ public class FullscreenActivity extends Activity {
 		getWindowManager().getDefaultDisplay().getMetrics(DM);
 		int x_pixel=DM.widthPixels-100;
 		int y_pixel=DM.heightPixels-400;
-		int x_per=x_pixel/x_dimen-50;
-		int y_per=y_pixel/y_dimen-50;
+		int x_per=x_pixel/x_dimen-10;
+		int y_per=y_pixel/y_dimen-10;
 		for (int i = 0; i < y_dimen; i++) {
 			
 			TableRow tableRow=new TableRow(this);
 			for (int j = 0; j < x_dimen; j++) {
 				Button button=new Button(this);
-				button.setId(j*10+i);
 				
-//				android.view.ViewGroup.LayoutParams layoutParams= button.getLayoutParams();
 				
 				TableRow.LayoutParams layoutParams=new TableRow.LayoutParams(x_per, y_per);
-//				layoutParams.height=y_per;
-//				layoutParams.width=x_per;
 				button.setLayoutParams(layoutParams);
-//				
 				float invisible=0.1f;
 				if (j==0||j==x_dimen-1||i==0||i==y_dimen-1) {
 					button.setAlpha(invisible);
 				}else {
 					button.setAlpha(1);
+					int color=Color.GREEN;
+					switch (testArray[j-1][i-1]) {
+					case 1:
+						color=Color.BLUE;		
+						break;
+					case 2:
+						color=Color.CYAN;
+						break;
+					case 3:
+						color=Color.DKGRAY;
+						break;
+					case 4:
+						color=Color.LTGRAY;
+						break;
+					case 5:
+						color=Color.MAGENTA;
+						break;	
+					case 6:
+						color=Color.RED;
+						break;
+					case 7:
+						color=Color.GREEN;
+						break;
+					case 8:
+						color=Color.BLACK;
+						break;
+					default:
+						color=Color.BLACK;
+						break;
+					}
+					button.setBackgroundColor(color);
+					button.setId((j-1)*100+i-1);
+					button.setOnClickListener(onClickListener);
 				}
 				tableRow.addView(button);
 			}

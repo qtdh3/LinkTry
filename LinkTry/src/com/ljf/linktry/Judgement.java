@@ -46,7 +46,7 @@ public class Judgement {
 	 * @return Suceess or Failed ,可以从pathPosArray获取桥点坐标，坐标以大数组为准（bigArray）
 	 * */
 
-	public boolean judge(int[] blockPosition1,int[] blockPosition2) {			//判断的一个注意点，   大小数组矩阵的转换 ，都放在最后一步，如 clear的判断
+	public boolean judge(int[] blockPosition1,int[] blockPosition2)throws IllegalArgumentException {			//判断的一个注意点，   大小数组矩阵的转换 ，都放在最后一步，如 clear的判断
 																	// 由于具体判断时不仅有用到大矩阵，还用到小矩阵，所以，最终方块消掉了以后要同时更新大矩阵与小矩阵
 		int[] blockPos1=new int[]{blockPosition1[0]+1,blockPosition1[1]+1};
 		int[] blockPos2=new int[]{blockPosition2[0]+1,blockPosition2[1]+1};
@@ -158,15 +158,17 @@ public class Judgement {
 	 * @param blockPosition2        the coordinate want to remove
 	 * @return if the input variables do not have any problem ,return turn 
 	 * */
-	public boolean removeBlocks(int[] blockPosition1,int[] blockPosition2){
-		if (!checkInputVariable(blockPosition1, blockPosition2)) {
+	public boolean removeBlocks(int[] blockPosition1,int[] blockPosition2) throws IllegalArgumentException{
+		int[] blockPos1=new int[]{blockPosition1[0]+1,blockPosition1[1]+1};
+		int[] blockPos2=new int[]{blockPosition2[0]+1,blockPosition2[1]+1};
+		if (!checkInputVariable(blockPos1, blockPos2)) {
 			throw new IllegalArgumentException("can not remove those coordinate");
 		}
 		else {
 			smallArray[blockPosition1[0]][blockPosition1[1]]=0;
-			bigArray[blockPosition1[0]+1][blockPosition1[1]+1]=0;
+			bigArray[blockPos1[0]][blockPos1[1]]=0;
 			smallArray[blockPosition2[0]][blockPosition2[1]]=0;
-			bigArray[blockPosition2[0]+1][blockPosition2[1]+1]=0;
+			bigArray[blockPos2[0]][blockPos2[1]]=0;
 		}
 		return true;
 	}
@@ -177,12 +179,16 @@ public class Judgement {
 	 * @param blockPosition2        the coordinate want to judge
 	 * @return if the input variables do not have any problem ,return turn 
 	 * */
-	public boolean judgeStyle(int[] blockPosition1,int[] blockPosition2){
-		if (!checkInputVariable(blockPosition1, blockPosition2)) {
-			throw new IllegalArgumentException("can not remove those coordinate");
+	public boolean judgeStyle(int[] blockPosition1,int[] blockPosition2)throws IllegalArgumentException{
+		int[] blockPos1=new int[]{blockPosition1[0]+1,blockPosition1[1]+1};
+		int[] blockPos2=new int[]{blockPosition2[0]+1,blockPosition2[1]+1};
+		
+		
+		if (!checkInputVariable(blockPos1, blockPos2)) {
+			throw new IllegalArgumentException("can not judge those coordinate");
 		}
 		else {
-			if (smallArray[blockPosition1[0]][blockPosition1[1]]==smallArray[blockPosition2[0]][blockPosition2[1]]) {
+			if (bigArray[blockPos1[0]][blockPos1[1]]==bigArray[blockPos2[0]][blockPos2[1]]) {
 				return true;
 			}
 		}
@@ -352,13 +358,14 @@ public class Judgement {
 	}
 
 	private boolean checkInputVariable(int[] blockPos1, int[] blockPos2) {
+		//  选择以大矩阵坐标，为输入对象
 		if (blockPos1.length==2&&blockPos2.length==2) 
 		{
 			if (blockPos1[0]==blockPos2[0]&&blockPos1[1]==blockPos2[1]) {
 				return false;
 			}
-			if (blockPos1[0]>=(xDimenLength+1)||blockPos2[0]>=(xDimenLength+1)
-					||blockPos1[1]>=(yDimenLength+1)||blockPos2[1]>=(yDimenLength+1)) {
+			if (blockPos1[0]>(xDimenLength+1)||blockPos2[0]>(xDimenLength+1)
+					||blockPos1[1]>(yDimenLength+1)||blockPos2[1]>(yDimenLength+1)) {
 				return false;
 			}
 			if (isEmpty(blockPos1)||isEmpty(blockPos2)) {
