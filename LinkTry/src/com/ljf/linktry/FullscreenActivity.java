@@ -7,7 +7,17 @@ import android.R.integer;
 import android.annotation.TargetApi;
 import android.app.ActionBar.LayoutParams;
 import android.app.Activity;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.StateListDrawable;
+import android.graphics.drawable.shapes.Shape;
+import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -133,7 +143,7 @@ public class FullscreenActivity extends Activity {
         // while interacting with the UI.
         findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
         
-        int[][] TestArray=RandomInit.twoDimenArray(8,12,8);
+        int[][] TestArray=RandomInit.twoDimenArray(8,8,16);
         judgement=new Judgement(TestArray);
         TableLayout tableLayout=  initBlocksView(TestArray);
         main_Layout.addView(tableLayout);
@@ -240,22 +250,31 @@ public class FullscreenActivity extends Activity {
 		y_dimen=testArray[0].length+2;
 		DisplayMetrics DM = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(DM);
-		int x_pixel=DM.widthPixels-100;
-		int y_pixel=DM.heightPixels-400;
-		int x_per=x_pixel/x_dimen-10;
-		int y_per=y_pixel/y_dimen-10;
+		int x_pixel=DM.widthPixels;
+//		int y_pixel=DM.heightPixels-400;
+		int x_per=x_pixel/x_dimen;
+//		int y_per=y_pixel/y_dimen-10;
 		for (int i = 0; i < y_dimen; i++) {
 			
 			TableRow tableRow=new TableRow(this);
 			for (int j = 0; j < x_dimen; j++) {
 				Button button=new Button(this);
-				
-				
-				TableRow.LayoutParams layoutParams=new TableRow.LayoutParams(x_per, y_per);
+				TableRow.LayoutParams layoutParams=new TableRow.LayoutParams(x_per, x_per);
 				button.setLayoutParams(layoutParams);
+//				button.setBackground(getResources().getDrawable(R.drawable.button_selector));
+				GradientDrawable shapeDrawable=(GradientDrawable) getResources().getDrawable(R.drawable.btn_shape);
+				Drawable[] drawables=new Drawable[]{getResources().getDrawable(R.drawable.ic_launcher),shapeDrawable};
+				LayerDrawable layerDrawable=new LayerDrawable(drawables);
+				StateListDrawable stateListDrawable=new StateListDrawable();
+//				int pressed= android.R.attr.state_pressed;
+				stateListDrawable.addState(new int[]{android.R.attr.state_pressed}, layerDrawable);
+//				button.setBackgroundResource(R.drawable.button_selector);
+//				button.setBackground(stateListDrawable);
+//				button.setBackgroundDrawable(stateListDrawable);
 				float invisible=0.1f;
 				if (j==0||j==x_dimen-1||i==0||i==y_dimen-1) {
 					button.setAlpha(invisible);
+//					button.setBackgroundColor(0xff99cc00);
 				}else {
 					button.setAlpha(1);
 					int color=Color.GREEN;
@@ -284,17 +303,46 @@ public class FullscreenActivity extends Activity {
 					case 8:
 						color=Color.BLACK;
 						break;
+					case 9:
+						color=Color.GRAY;
+						break;
+					case 10:
+						color=0xFF13579b;
+						break;
+					case 11:
+						color=Color.WHITE;
+						break;
+					case 12:
+						color=Color.YELLOW;
+						break;
+					case 13:
+						color=com.ljf.linktry.R.color.black_overlay;
+						break;
+					case 14:
+						color=0xFFdd7711;
+						break;
+					case 15:
+						color=0xFF336699;
+						break;
+					case 16:
+						color=0xFFb91357;
+						break;
+						
 					default:
 						color=Color.BLACK;
 						break;
 					}
-					button.setBackgroundColor(color);
+//					Drawable drawable=getResources().getDrawable(R.drawable.ic_launcher);
+					ColorDrawable colorDrawable=new ColorDrawable(color);
+					stateListDrawable.addState(new int[]{-android.R.attr.state_pressed}, colorDrawable);
+					button.setBackgroundDrawable(stateListDrawable);
+//					button.setBackgroundColor(color);
 					button.setId((j-1)*100+i-1);
 					button.setOnClickListener(onClickListener);
 				}
 				tableRow.addView(button);
 			}
-			tableLayout.setShrinkAllColumns(true);
+//			tableLayout.setShrinkAllColumns(true);
 			tableLayout.addView(tableRow);
 			
 		}
