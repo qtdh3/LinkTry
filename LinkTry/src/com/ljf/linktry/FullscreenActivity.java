@@ -46,23 +46,26 @@ public class FullscreenActivity extends Activity {
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
      */
     private static final boolean AUTO_HIDE = true;
+//	 private static final boolean AUTO_HIDE = false;
 
-    /**
-     * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
-     * user interaction before hiding the system UI.
-     */
-    private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
+//    /**
+//     * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
+//     * user interaction before hiding the system UI.
+//     */
+//    private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
 
     /**
      * If set, will toggle the system UI visibility upon interaction. Otherwise,
      * will show the system UI visibility upon interaction.
      */
-    private static final boolean TOGGLE_ON_CLICK = true;
+//    private static final boolean TOGGLE_ON_CLICK = true;
+    private static final boolean TOGGLE_ON_CLICK = false;
 
     /**
      * The flags to pass to {@link SystemUiHider#getInstance}.
      */
-    private static final int HIDER_FLAGS = SystemUiHider.FLAG_HIDE_NAVIGATION;
+//    private static final int HIDER_FLAGS = SystemUiHider.FLAG_HIDE_NAVIGATION;
+    private static final int HIDER_FLAGS = SystemUiHider.FLAG_FULLSCREEN;
 
     /**
      * The instance of the {@link SystemUiHider} for this activity.
@@ -106,8 +109,9 @@ public class FullscreenActivity extends Activity {
 //                                mControlsHeight = controlsView.getHeight();
 //                            }
 //                            if (mShortAnimTime == 0) {
-//                                mShortAnimTime = getResources().getInteger(
-//                                        android.R.integer.config_shortAnimTime);
+////                                mShortAnimTime = getResources().getInteger(
+////                                        android.R.integer.config_shortAnimTime);
+//                                mShortAnimTime = 1000;
 //                            }
 //                            controlsView.animate()
 //                                    .translationY(visible ? 0 : mControlsHeight)
@@ -121,39 +125,33 @@ public class FullscreenActivity extends Activity {
 //
 //                        if (visible && AUTO_HIDE) {
 //                            // Schedule a hide().
-//                            delayedHide(AUTO_HIDE_DELAY_MILLIS);
+////                            delayedHide(AUTO_HIDE_DELAY_MILLIS);
+//                        	delayedHide(1200);
 //                        }
                     }
                 });
 
         // Set up the user interaction to manually show or hide the system UI.
-        contentView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+//        contentView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
 //                if (TOGGLE_ON_CLICK) {
 //                    mSystemUiHider.toggle();
 //                } else {
 //                    mSystemUiHider.show();
 //                }
-            }
-        });
+//            }});
 
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
-        findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
+//        findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
         
         int[][] TestArray=RandomInit.twoDimenArray(8,8,16);
         judgement=new Judgement(TestArray);
         TableLayout tableLayout=  initBlocksView(TestArray);
         main_Layout.addView(tableLayout);
         
-//        LinearLayout linearLayout=new LinearLayout(this);
-//        LinearLayout.LayoutParams layoutParams=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 400);
-////        layoutParams.height=200;
-////        layoutParams.width=50;
-//        linearLayout.setLayoutParams(layoutParams);
-//        linearLayout.setBackgroundColor(color.holo_blue_light);
         TextView textView=new TextView(this);
         LinearLayout.LayoutParams lP=  new LinearLayout.LayoutParams(-1, 400);
         lP.height=400;
@@ -165,43 +163,6 @@ public class FullscreenActivity extends Activity {
         textView.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL);
 //        textView.setHeight(100);     //该句有效  ，不过在上述LayoutParams 存在时无效
         main_Layout.addView(textView);
-        
-//       View view=  LayoutInflater.from(this).inflate(R.layout.testtv, null);
-//       TextView tView=(TextView) view.findViewById(R.id.test_tv);
-//       LinearLayout.LayoutParams lP=  new LinearLayout.LayoutParams(-1,-1);
-//       lP.height=200;
-//       tView.setLayoutParams(lP);
-//       tView.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL); 
-//       main_Layout.addView(tView);
-       
-        
-        
-//        
-//        
-//        new Thread(new Runnable() {
-//			
-//			@Override
-//			public void run() {
-//				 try {
-//						int[][] TestArray=RandomInit.twoDimenArray(6,10, 10);
-//						TestArray[3][4]=0;
-//						TestArray[3][5]=0;
-//						TestArray[4][5]=0;
-//						TestArray[5][5]=0;
-//						TestArray[5][4]=0;
-//						
-//						Judgement judgement=new Judgement(TestArray);
-//						judgement.judge(new int[]{3,3} ,new int[] {5,3});
-////						judgement.judge(new int[]{5,9} ,new int[] {5,3});
-////						judgement.judge(new int[]{1,0} ,new int[] {5,0});
-////						judgement.judge(new int[]{1,9} ,new int[] {5,9});
-//					} catch (IllegalArgumentException e) {
-//						Log.e(Tag, "IllegalArgumentException");
-//						e.printStackTrace();
-//					} 
-//			}
-//		}).start();
-       
     }
     private View.OnClickListener onClickListener= new OnClickListener() {
 		
@@ -274,7 +235,7 @@ public class FullscreenActivity extends Activity {
 				float invisible=0.1f;
 				if (j==0||j==x_dimen-1||i==0||i==y_dimen-1) {
 					button.setAlpha(invisible);
-//					button.setBackgroundColor(0xff99cc00);
+					button.setBackgroundColor(0xff99cc00);
 				}else {
 					button.setAlpha(1);
 					int color=Color.GREEN;
@@ -380,7 +341,8 @@ public class FullscreenActivity extends Activity {
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
             if (AUTO_HIDE) {
-                delayedHide(AUTO_HIDE_DELAY_MILLIS);
+//                delayedHide(AUTO_HIDE_DELAY_MILLIS);
+            	delayedHide(100);
             }
             return false;
         }
