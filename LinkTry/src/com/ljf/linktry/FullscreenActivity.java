@@ -10,6 +10,8 @@ import android.app.Activity;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -23,12 +25,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -72,18 +77,40 @@ public class FullscreenActivity extends Activity {
      */
     private SystemUiHider mSystemUiHider;
     private int[] lastBlockPos=null;
+    private int[] lastBlockPosReal=null;
     private Judgement judgement=null;
+    int stateBarHeit;
     
     private static final String Tag =  "MainActivity";
+    
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+    	// TODO Auto-generated method stub
+    	super.onWindowFocusChanged(hasFocus);
+    	Log.e(Tag, "onWindowFocusChanged");
+    	
+    	 Rect noStateBarRect = new Rect();  
+         getWindow().getDecorView().getWindowVisibleDisplayFrame(noStateBarRect);   
+         stateBarHeit=noStateBarRect.top;
+         Display display=getWindowManager().getDefaultDisplay();  
+         Point outSize=new Point();
+ 		display.getSize(outSize);
+ 		Rect drawRect=new Rect();
+ 		getWindow().getDecorView().findViewById(Window.ID_ANDROID_CONTENT).getDrawingRect(drawRect);
+ 		Log.e(Tag, "Screen Height="+outSize.y+";stateBarHeit="+stateBarHeit+";drawRect.top="+drawRect.top+";drawRect.height"+drawRect.height());
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        
+        requestWindowFeature(Window.FEATURE_NO_TITLE); 
+        
         setContentView(R.layout.activity_main);
 
         final View controlsView = findViewById(R.id.fullscreen_content_controls);
         final View contentView = findViewById(R.id.fullscreen_content);
+        
         
         final LinearLayout main_Layout=(LinearLayout) findViewById(R.id.main_page_part);
 
@@ -147,6 +174,8 @@ public class FullscreenActivity extends Activity {
         // while interacting with the UI.
 //        findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
         
+        
+        
         int[][] TestArray=RandomInit.twoDimenArray(8,8,16);
         judgement=new Judgement(TestArray);
         TableLayout tableLayout=  initBlocksView(TestArray);
@@ -163,16 +192,42 @@ public class FullscreenActivity extends Activity {
         textView.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL);
 //        textView.setHeight(100);     //该句有效  ，不过在上述LayoutParams 存在时无效
         main_Layout.addView(textView);
+        
+        
+//        MyView myView=new MyView(this);
+//        myView.setPosArray(TestArray[0]);
+//        FrameLayout frameLayout=(FrameLayout) findViewById(R.id.framelayoutinside);
+//        frameLayout.addView(myView);
+        
+        Rect noStateBarRect = new Rect();  
+        getWindow().getDecorView().getWindowVisibleDisplayFrame(noStateBarRect);   
+        stateBarHeit=noStateBarRect.top;
+        Display display=getWindowManager().getDefaultDisplay();  
+        Point outSize=new Point();
+		display.getSize(outSize);
+		Rect drawRect=new Rect();
+		getWindow().getDecorView().findViewById(Window.ID_ANDROID_CONTENT).getDrawingRect(drawRect);
+		Log.e(Tag, "Screen Height="+outSize.y+";stateBarHeit="+stateBarHeit+";drawRect.top="+drawRect.top+";drawRect.height"+drawRect.height());
     }
     private View.OnClickListener onClickListener= new OnClickListener() {
 		
 		@Override
 		public void onClick(View v) {
 		     int btnId=	v.getId();
+		     Log.e(Tag, "onClickListener:"+btnId);
 		     int[] blockPosNow=new int[2];
 		     blockPosNow[0]=btnId/100;
 		     blockPosNow[1]=btnId%100;
-		     Log.e(Tag, "onClickListener:"+btnId);
+		     
+		     int[] globalPosArray=new int[2];
+		     v.getLocationInWindow(globalPosArray);
+		     globalPosArray[1]-=stateBarHeit;
+		     Log.e(Tag, "LocationInWindow:"+globalPosArray[0]+","+globalPosArray[1]);
+		     
+		     Rect r=new Rect();
+			 v.getLocalVisibleRect(r);
+			 Log.e(Tag, "LocalVisibleRect:top-"+r.top+";left--"+r.left+";bottom--"+r.bottom+";right--"+r.right);
+
 		     boolean isRight=false;
 		     if (lastBlockPos!=null) {
 		    	 if (lastBlockPos[0]!=blockPosNow[0]||lastBlockPos[1]!=blockPosNow[1]) {
@@ -182,6 +237,18 @@ public class FullscreenActivity extends Activity {
 					    		 if (judgement.judgeStyle(lastBlockPos, blockPosNow)) {
 					    			 Log.e(Tag, "样式判断结果为--成立");
 					    			 judgement.removeBlocks(lastBlockPos, blockPosNow);
+					    			 int[] pathArray= judgement.pathPosArray;
+					    			 
+					    			 try {
+										 MyView myView=new MyView(FullscreenActivity.this);
+					    		         myView.setPosArray(lastBlockPosReal,globalPosArray, pathArray);
+					    		         FrameLayout frameLayout=(FrameLayout) findViewById(R.id.framelayoutinside);
+					    		         frameLayout.addView(myView);
+									} catch (IllegalArgumentException e) {
+										 e.printStackTrace();
+									}
+					    			
+					    		        
 					    			 v.setAlpha(0);
 					    			 View lastbtn=((View) v.getParent().getParent()).findViewById(lastBlockPos[0]*100+lastBlockPos[1]);
 					    			 lastbtn.setAlpha(0);
@@ -197,6 +264,7 @@ public class FullscreenActivity extends Activity {
 			}
 		    else {
 				lastBlockPos=blockPosNow;
+				lastBlockPosReal=globalPosArray;
 			}
 		     
 		}
