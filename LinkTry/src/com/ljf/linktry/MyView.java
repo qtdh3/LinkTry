@@ -53,7 +53,7 @@ public class MyView extends View {
 			break;
 		}
 		path.lineTo(blockPosNow[0], blockPosNow[1]);
-		path.close();
+//		path.close();        //该句会回到初始点，形成封闭的曲线
 //		canvas.drawCircle(340, 340, 130, paint);
 		canvas.drawPath(path, paint);
 	}

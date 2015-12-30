@@ -1,5 +1,8 @@
 package com.ljf.linktry;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import com.ljf.linktry.util.SystemUiHider;
 
 import android.R.color;
@@ -80,8 +83,11 @@ public class FullscreenActivity extends Activity {
     private int[] lastBlockPosReal=null;
     private Judgement judgement=null;
     int stateBarHeit;
+    private int[] LeftRightPosReal=null;
+    private int blockLinesLength;
     
     private static final String Tag =  "MainActivity";
+    
     
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
@@ -97,7 +103,7 @@ public class FullscreenActivity extends Activity {
  		display.getSize(outSize);
  		Rect drawRect=new Rect();
  		getWindow().getDecorView().findViewById(Window.ID_ANDROID_CONTENT).getDrawingRect(drawRect);
- 		Log.e(Tag, "Screen Height="+outSize.y+";stateBarHeit="+stateBarHeit+";drawRect.top="+drawRect.top+";drawRect.height"+drawRect.height());
+ 		Log.e(Tag, "Screen Height="+outSize.y+";stateBarHeit="+stateBarHeit+";noStateBarRect.height="+noStateBarRect.height()+";drawRect.top="+drawRect.top+";drawRect.height"+drawRect.height());
     }
 
     @Override
@@ -215,18 +221,21 @@ public class FullscreenActivity extends Activity {
 		public void onClick(View v) {
 		     int btnId=	v.getId();
 		     Log.e(Tag, "onClickListener:"+btnId);
-		     int[] blockPosNow=new int[2];
+		     // get the matrix simple coordinate
+		     final int[] blockPosNow=new int[2];
 		     blockPosNow[0]=btnId/100;
 		     blockPosNow[1]=btnId%100;
 		     
+		     if (LeftRightPosReal==null) {
+				setOriginalCoordinate();
+			}
+		     // turn to Canvas Block Center Coordinate
 		     int[] globalPosArray=new int[2];
 		     v.getLocationInWindow(globalPosArray);
 		     globalPosArray[1]-=stateBarHeit;
-		     Log.e(Tag, "LocationInWindow:"+globalPosArray[0]+","+globalPosArray[1]);
-		     
-		     Rect r=new Rect();
-			 v.getLocalVisibleRect(r);
-			 Log.e(Tag, "LocalVisibleRect:top-"+r.top+";left--"+r.left+";bottom--"+r.bottom+";right--"+r.right);
+		     globalPosArray[0]+=blockLinesLength/2;
+		     globalPosArray[1]+=blockLinesLength/2;
+//		     Log.e(Tag, "LocationInCanvas:"+globalPosArray[0]+","+globalPosArray[1]);
 
 		     boolean isRight=false;
 		     if (lastBlockPos!=null) {
@@ -238,20 +247,37 @@ public class FullscreenActivity extends Activity {
 					    			 Log.e(Tag, "样式判断结果为--成立");
 					    			 judgement.removeBlocks(lastBlockPos, blockPosNow);
 					    			 int[] pathArray= judgement.pathPosArray;
-					    			 
+					    			 FrameLayout frameLayout=(FrameLayout) findViewById(R.id.framelayoutinside);
 					    			 try {
+					    			     // change simple matrix coordinate into canvas coordinate
+//					    				 Log.e(Tag, "LeftRightPosReal:"+LeftRightPosReal[0]+","+LeftRightPosReal[1]);
+					    				 for (int i = 0; i < pathArray.length-1; i++) {
+												pathArray[i]=(pathArray[i])*blockLinesLength+LeftRightPosReal[i%2]-blockLinesLength/2-(i%2)*stateBarHeit;
+//												Log.e(Tag, "第"+i+"个path值="+pathArray[i]);
+										 }
+					    				 
+					    				 // add View to show the path line with white color
 										 MyView myView=new MyView(FullscreenActivity.this);
 					    		         myView.setPosArray(lastBlockPosReal,globalPosArray, pathArray);
-					    		         FrameLayout frameLayout=(FrameLayout) findViewById(R.id.framelayoutinside);
 					    		         frameLayout.addView(myView);
+					    		         
+					    			     
 									} catch (IllegalArgumentException e) {
 										 e.printStackTrace();
 									}
-					    			
-					    		        
-					    			 v.setAlpha(0);
-					    			 View lastbtn=((View) v.getParent().getParent()).findViewById(lastBlockPos[0]*100+lastBlockPos[1]);
-					    			 lastbtn.setAlpha(0);
+					    			 
+					    			//delay one second then   removeBlockAndLine
+					    			final int[] lastBlockPosCopy=lastBlockPos;
+					    			TimerTask timerTask=new TimerTask() {
+										@Override
+										public void run() {
+											// TODO Auto-generated method stub
+											removeBlockAndLine(lastBlockPosCopy,blockPosNow);
+										}
+									};
+									Timer timer=new Timer();
+									timer.schedule(timerTask, 1000);
+					    		      
 					    			 isRight=true;	 }
 					    	 }
 						} catch (Exception e) {
@@ -267,6 +293,31 @@ public class FullscreenActivity extends Activity {
 				lastBlockPosReal=globalPosArray;
 			}
 		     
+		}
+		
+		private void removeBlockAndLine(
+				final int[] lastBlockPos,
+				final int[] blockPosNow) {
+			// TODO Auto-generated method stub
+//			findViewById(0).setAlpha(0);
+			runOnUiThread(new Runnable() {
+				public void run() {
+					findViewById(100*lastBlockPos[0]+lastBlockPos[1]).setAlpha(0);
+					findViewById(blockPosNow[0]*100+blockPosNow[1]).setAlpha(0);
+					FrameLayout frameLayout=(FrameLayout) findViewById(R.id.framelayoutinside);
+					frameLayout.removeViewAt(frameLayout.getChildCount()-1);
+				}
+			});
+			
+		}
+
+		private void setOriginalCoordinate() {
+			 View firstButtonView=findViewById(0);
+			 LeftRightPosReal=new int[2];
+		     firstButtonView.getLocationInWindow(LeftRightPosReal);
+		     Rect rectTopLeft=new Rect();
+			 firstButtonView.getLocalVisibleRect(rectTopLeft);
+			 blockLinesLength=rectTopLeft.right;
 		}
 	};
 
