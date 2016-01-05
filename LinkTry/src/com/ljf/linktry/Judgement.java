@@ -7,6 +7,7 @@ public class Judgement {
 	private int xDimenLength;
 	private int yDimenLength;
 	private int[][] bigArray = null;
+	private int styleNum=0;
 	int[] pathPosArray = null;
 	public static final String Tag = "Judgement";
 	public static final int LinkType1 = 1;
@@ -18,11 +19,12 @@ public class Judgement {
 	 * @param smallArray
 	 * 
 	 */
-	public Judgement(int[][] smallArray) {
+	public Judgement(int[][] smallArray,int styleNum) {
 		super();
 		this.smallArray = smallArray;
 		this.xDimenLength = smallArray.length;
 		this.yDimenLength = smallArray[0].length;
+		this.styleNum=styleNum;
 		initBigArray();
 	}
 
@@ -34,6 +36,52 @@ public class Judgement {
 			}
 		}
 //		printLocalStates(bigArray, "initBigArray bigarray 3");
+	}
+	
+	
+	public int[] checkForPairs()throws Exception {
+		int[][] testPosArray=null;
+		int count=0;
+		for (int styleIndex = 1; styleIndex <= this.styleNum; styleIndex++) {
+			testPosArray=new int[8][2];
+			count=0;
+			int nonZeroCount=0;
+			for (int i = 0; i < smallArray.length; i++) {
+				for (int j = 0; j < smallArray[0].length; j++) {
+					if (smallArray[i][j]!=0) {
+						nonZeroCount++;
+					}
+				}
+			}
+			if (nonZeroCount==0) {
+				throw new IllegalStateException("have removed all the blocks");
+			}
+			for (int i = 0; i < smallArray.length; i++) {
+				for (int j = 0; j < smallArray[0].length; j++) {
+					if (smallArray[i][j]==styleIndex) {
+						testPosArray[count]=new int[]{i,j};
+						count++;
+					}
+				}
+			}
+			Log.e(Tag, "count="+count);
+			if (count%2!=0) {
+				throw new IllegalStateException("block Number must be paired");
+			}
+			
+			for (int i = 0; i < count-1; i++) {
+				for (int j = i+1; j < count; j++) {
+					Log.e(Tag, "check for point:"+i+","+j);
+					if (judge(testPosArray[i], testPosArray[j])) {
+						Log.e(Tag, "checkPairs success");
+						return new int[]{testPosArray[i][0],testPosArray[i][1],testPosArray[j][0],testPosArray[j][1],pathPosArray[pathPosArray.length-1]};	
+					}
+				}
+			}
+		}
+		return new int[]{0};
+//		return new int[]{checkPos1[0],checkPos1[1],checkPos1[2],checkPos2[3],LinkType1};
+		
 	}
 
 	
@@ -133,6 +181,7 @@ public class Judgement {
 				blockPosition1[1] + 1 };
 		int[] blockPos2 = new int[] { blockPosition2[0] + 1,
 				blockPosition2[1] + 1 };
+		
 
 		if (!checkInputVariable(blockPos1, blockPos2)) {
 			throw new IllegalArgumentException("can not judge those coordinate");

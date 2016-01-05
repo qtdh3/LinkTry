@@ -5,6 +5,7 @@ import java.util.TimerTask;
 
 import com.ljf.linktry.util.SystemUiHider;
 
+import android.R.color;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.graphics.Color;
@@ -22,6 +23,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -74,28 +77,37 @@ public class FullscreenActivity extends Activity {
 
 	private static final String Tag = "MainActivity";
 
-/*	 @Override
-	 public void onWindowFocusChanged(boolean hasFocus) {
-	 super.onWindowFocusChanged(hasFocus);
-	
-	 Log.e(Tag, "onWindowFocusChanged");
-	 Display display=getWindowManager().getDefaultDisplay();
-	 Point outSize=new Point();
-	 display.getSize(outSize);
-	
-	 Rect noStateBarRect = new Rect();
-	 getWindow().getDecorView().getWindowVisibleDisplayFrame(noStateBarRect);
-	 int stateBarHeit = noStateBarRect.top;
-	
-	 Rect drawRect=new Rect();
-	 getWindow().getDecorView().findViewById(Window.ID_ANDROID_CONTENT).getDrawingRect(drawRect);
-	 Log.e(Tag,
-	 "Window.ID_ANDROID_CONTENT："+getWindow().getDecorView().findViewById(Window.ID_ANDROID_CONTENT));
-	 int top=
-	 getWindow().getDecorView().findViewById(Window.ID_ANDROID_CONTENT).getTop();
-	 Log.e(Tag,
-	 "Screen Height="+outSize.y+";stateBarHeit="+stateBarHeit+";noStateBarRect.height="+noStateBarRect.height()+";\ndrawRect.top="+top+";drawRect.height"+drawRect.height());
-	 }*/
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+
+		Log.e(Tag, "onWindowFocusChanged");
+		
+		setOriginalCoordinate();
+		
+		/*Display display = getWindowManager().getDefaultDisplay();
+		Point outSize = new Point();
+		display.getSize(outSize);
+
+		Rect noStateBarRect = new Rect();
+		getWindow().getDecorView().getWindowVisibleDisplayFrame(noStateBarRect);
+		int stateBarHeit = noStateBarRect.top;
+
+		Rect drawRect = new Rect();
+		getWindow().getDecorView().findViewById(Window.ID_ANDROID_CONTENT)
+				.getDrawingRect(drawRect);
+		Log.e(Tag,
+				"Window.ID_ANDROID_CONTENT："
+						+ getWindow().getDecorView().findViewById(
+								Window.ID_ANDROID_CONTENT));
+		int top = getWindow().getDecorView()
+				.findViewById(Window.ID_ANDROID_CONTENT).getTop();
+		Log.e(Tag,
+				"Screen Height=" + outSize.y + ";stateBarHeit=" + stateBarHeit
+						+ ";noStateBarRect.height=" + noStateBarRect.height()
+						+ ";\ndrawRect.top=" + top + ";drawRect.height"
+						+ drawRect.height());*/
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -175,9 +187,52 @@ public class FullscreenActivity extends Activity {
 		// findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
 
 		int[][] TestArray = RandomInit.twoDimenArray(8, 8, 16);
-		judgement = new Judgement(TestArray);
+		judgement = new Judgement(TestArray,16);
 		TableLayout tableLayout = initBlocksView(TestArray);
 		main_Layout.addView(tableLayout);
+		
+		
+		Button hintButton=new Button(this);
+		hintButton.setText("Hint");
+		hintButton.setBackgroundColor(Color.BLUE);
+		hintButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Log.e(Tag, "hintButton Pressed");
+				int[] checkResult=null;
+				try {
+					checkResult = judgement.checkForPairs();
+				} catch(IllegalStateException exception){
+					exception.printStackTrace();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if (checkResult.length<4) {
+					Log.e(Tag, "没有匹配的结果，需要重新调整阵列");
+				}else {
+					for (int i = 0; i < 4; i++) {
+						checkResult[i] = (checkResult[i])
+								* blockLinesLength
+								+ LeftRightPosReal[i % 2];
+					}
+					
+					final MyRectangleView myRectangleView=new MyRectangleView(FullscreenActivity.this);
+					myRectangleView.setRectangles(new int[]{checkResult[0],checkResult[1]}, new int[]{checkResult[2],checkResult[3]}, blockLinesLength);
+					final FrameLayout frameLayout = (FrameLayout) findViewById(R.id.framelayoutinside);
+					frameLayout.addView(myRectangleView);
+					frameLayout.postDelayed(new Runnable() {
+						@Override
+						public void run() {
+							frameLayout.removeView(myRectangleView);
+							
+						}
+					}, 1000);
+				}
+				
+			}
+		});
+		main_Layout.addView(hintButton);
 
 		/*TextView textView = new TextView(this);
 		LinearLayout.LayoutParams lP = new LinearLayout.LayoutParams(-1, 400);
@@ -251,15 +306,17 @@ public class FullscreenActivity extends Activity {
 
 								// delay one second then removeBlockAndLine
 								final int[] lastBlockPosCopy = lastBlockPos;
-								TimerTask timerTask = new TimerTask() {
-									@Override
-									public void run() {
-										removeBlockAndLine(lastBlockPosCopy,
-												blockPosNow);
-									}
-								};
-								Timer timer = new Timer();
-								timer.schedule(timerTask, 1000);
+								
+//								TimerTask timerTask = new TimerTask() {
+//									@Override
+//									public void run() {
+//										removeBlockAndLine(lastBlockPosCopy,
+//												blockPosNow);
+//									}
+//								};
+//								Timer timer = new Timer();
+//								timer.schedule(timerTask, 1500);
+								removeBlockAndLine(lastBlockPosCopy,blockPosNow);
 								isRight = true;
 							}
 						}
@@ -279,6 +336,8 @@ public class FullscreenActivity extends Activity {
 
 	};
 
+	protected int normalViewCount =3;
+
 	private static final int MARGINS_LEFT = 5;
 	private static final int MARGINS_TOP = 5;
 
@@ -287,11 +346,44 @@ public class FullscreenActivity extends Activity {
 		// findViewById(0).setAlpha(0);
 		runOnUiThread(new Runnable() {
 			public void run() {
-				findViewById(100 * lastBlockPos[0] + lastBlockPos[1]).setAlpha(
-						0);
-				findViewById(blockPosNow[0] * 100 + blockPosNow[1]).setAlpha(0);
-				FrameLayout frameLayout = (FrameLayout) findViewById(R.id.framelayoutinside);
-				frameLayout.removeViewAt(frameLayout.getChildCount() - 1);
+//				findViewById(100 * lastBlockPos[0] + lastBlockPos[1]).setAlpha(
+//						0);
+//				findViewById(blockPosNow[0] * 100 + blockPosNow[1]).setAlpha(0);
+				final FrameLayout frameLayout = (FrameLayout) findViewById(R.id.framelayoutinside);
+				int childViewCount=frameLayout.getChildCount();
+				Log.e(Tag, "childViewCount="+childViewCount);
+				Animation animation=AnimationUtils.loadAnimation(FullscreenActivity.this, R.anim.disappear);
+				animation.setFillAfter(true);
+				final View shouRemoveView;
+//				if (childViewCount>normalViewCount ) {	
+//					shouRemoveView=frameLayout.getChildAt(normalViewCount - 1);
+//							shouRemoveView.startAnimation(animation);		
+//				}else {
+					shouRemoveView=frameLayout.getChildAt(childViewCount - 1);
+					shouRemoveView.startAnimation(animation);
+					Log.e(Tag, "shouRemoveView"+shouRemoveView);
+//				}
+				findViewById(100 * lastBlockPos[0] + lastBlockPos[1]).startAnimation(animation);
+				findViewById(blockPosNow[0] * 100 + blockPosNow[1]).startAnimation(animation);
+				frameLayout.postDelayed(new Runnable() {
+					
+					@Override
+					public void run() {
+						frameLayout.removeView(shouRemoveView);
+						findViewById(100 * lastBlockPos[0] + lastBlockPos[1]).setAlpha(
+								0);
+						findViewById(blockPosNow[0] * 100 + blockPosNow[1]).setAlpha(0);
+					}
+				}, 1000);
+//				TimerTask timerTask = new TimerTask() {
+//					@Override
+//					public void run() {
+//						frameLayout.removeView(shouRemoveView);
+//						
+//					}
+//				};
+//				Timer timer = new Timer();
+//				timer.schedule(timerTask, 1000);
 			}
 		});
 
