@@ -4,6 +4,8 @@ import android.util.Log;
 
 public class Judgement {
 	private int[][] smallArray = null;
+	
+
 	private int xDimenLength;
 	private int yDimenLength;
 	private int[][] bigArray = null;
@@ -389,6 +391,10 @@ public class Judgement {
 			return true;
 		}
 		return false;
+	}
+	
+	public int[][] getSmallArray() {
+		return smallArray;
 	}
 
 }

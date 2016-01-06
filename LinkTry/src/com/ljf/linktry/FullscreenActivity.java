@@ -1,11 +1,6 @@
 package com.ljf.linktry;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 import com.ljf.linktry.util.SystemUiHider;
-
-import android.R.color;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.graphics.Color;
@@ -74,6 +69,10 @@ public class FullscreenActivity extends Activity {
 	private Judgement judgement = null;
 	private int[] LeftRightPosReal = null;
 	private int blockLinesLength;
+
+//	private static final int TABLEVIEWIDNUM=314758;
+
+	private static final int STYLENUM=16;
 
 	private static final String Tag = "MainActivity";
 
@@ -186,9 +185,10 @@ public class FullscreenActivity extends Activity {
 		// while interacting with the UI.
 		// findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
 
-		int[][] TestArray = RandomInit.twoDimenArray(8, 8, 16);
+		int[][] TestArray = RandomInit.twoDimenArray(8, 8, STYLENUM);
 		judgement = new Judgement(TestArray,16);
 		TableLayout tableLayout = initBlocksView(TestArray);
+//		tableLayout.setId(TABLEVIEWIDNUM);
 		main_Layout.addView(tableLayout);
 		
 		
@@ -205,7 +205,6 @@ public class FullscreenActivity extends Activity {
 				} catch(IllegalStateException exception){
 					exception.printStackTrace();
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				if (checkResult.length<4) {
@@ -229,10 +228,25 @@ public class FullscreenActivity extends Activity {
 						}
 					}, 1000);
 				}
-				
 			}
 		});
 		main_Layout.addView(hintButton);
+		
+		Button resetButton=new Button(this);
+		resetButton.setText("ResetMatrix");
+		resetButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Log.e(Tag, "resetButton Pressed");
+				int[][] haveResetArray= RandomInit.adjustRestMatrix(judgement.getSmallArray(),STYLENUM);
+				judgement=new Judgement(haveResetArray, STYLENUM);
+				TableLayout haveResettableLayout= initBlocksView(haveResetArray);
+				main_Layout.removeViewAt(0);
+				main_Layout.addView(haveResettableLayout, 0);
+			}
+		});
+		main_Layout.addView(resetButton);
 
 		/*TextView textView = new TextView(this);
 		LinearLayout.LayoutParams lP = new LinearLayout.LayoutParams(-1, 400);
@@ -436,7 +450,6 @@ public class FullscreenActivity extends Activity {
 					button.setAlpha(invisible);
 					button.setBackgroundColor(0xff99cc00);
 				} else {
-					button.setAlpha(1);
 					int color = Color.GREEN;
 					switch (testArray[j - 1][i - 1]) {
 					case 1:
@@ -488,8 +501,10 @@ public class FullscreenActivity extends Activity {
 						color = 0xFFb91357;
 						break;
 
-					default:
-						color = Color.BLACK;
+					default:                    // inclue the case 0:
+						color = Color.TRANSPARENT;
+//						button.setAlpha(invisible);
+						button.setAlpha(0f);
 						break;
 					}
 					// drawable=getResources().getDrawable(R.drawable.ic_launcher);
@@ -501,6 +516,7 @@ public class FullscreenActivity extends Activity {
 					// button.setBackgroundColor(color);
 					button.setId((j - 1) * 100 + i - 1);
 					button.setOnClickListener(onClickListener);
+//					button.setAlpha(1);
 				}
 				tableRow.addView(button);
 			}

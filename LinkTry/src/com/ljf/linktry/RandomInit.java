@@ -2,6 +2,8 @@ package com.ljf.linktry;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import android.R.integer;
 import android.util.Log;
 
 public class RandomInit {
@@ -65,5 +67,34 @@ public class RandomInit {
 			remainNum.remove(randomNum);
 		}
 		return resultArray;
+	}
+	
+	public static int[][] adjustRestMatrix(int[][] ArrayHasToReset,int styleNum) {
+		int[] nonEmptySave=new int[ArrayHasToReset.length*ArrayHasToReset[0].length];
+		int nonEmptyCount=0;
+		int styleIndex=0;
+		for (int i = 0; i < ArrayHasToReset.length; i++) {
+			for (int j = 0; j < ArrayHasToReset[0].length; j++) {
+				styleIndex=ArrayHasToReset[i][j];
+				if (styleIndex!=0) {
+					nonEmptySave[nonEmptyCount]=styleIndex;
+					nonEmptyCount++;
+				}
+			}
+		}
+		int randomIndex=0;
+	    int[] oneDimenArray=createRandomOneDimenArray(nonEmptyCount);
+	    for (int i = 0; i < ArrayHasToReset.length; i++) {
+			for (int j = 0; j < ArrayHasToReset[0].length; j++) {
+				styleIndex=ArrayHasToReset[i][j];
+				if (styleIndex!=0) {
+					randomIndex= oneDimenArray[nonEmptyCount-1];
+					ArrayHasToReset[i][j]=nonEmptySave[randomIndex];
+					nonEmptyCount--;
+				}
+			}
+		}
+		
+		return ArrayHasToReset;
 	}
 }
