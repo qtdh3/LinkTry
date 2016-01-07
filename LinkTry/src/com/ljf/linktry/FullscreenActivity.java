@@ -59,11 +59,8 @@ public class FullscreenActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-
 		setContentView(R.layout.activity_main);
-
 		final LinearLayout main_Layout = (LinearLayout) findViewById(R.id.main_page_part);
 
 		int[][] TestArray = RandomInit.twoDimenArray(8, 8, STYLENUM);
@@ -71,9 +68,7 @@ public class FullscreenActivity extends Activity {
 		TableLayout tableLayout = initBlocksView(TestArray);
 		main_Layout.addView(tableLayout);
 		
-		Button hintButton=new Button(this);
-		hintButton.setText("Hint");
-		hintButton.setBackgroundColor(Color.BLUE);
+		Button hintButton=(Button) findViewById(R.id.hint_button);
 		hintButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -109,10 +104,8 @@ public class FullscreenActivity extends Activity {
 				}
 			}
 		});
-		main_Layout.addView(hintButton);
 		
-		Button resetButton=new Button(this);
-		resetButton.setText("ResetMatrix");
+		Button resetButton=(Button) findViewById(R.id.reset_Button);
 		resetButton.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -125,7 +118,6 @@ public class FullscreenActivity extends Activity {
 				main_Layout.addView(haveResettableLayout, 0);
 			}
 		});
-		main_Layout.addView(resetButton);
 	}
 
 	private View.OnClickListener blocks_onClickListener = new OnClickListener() {
