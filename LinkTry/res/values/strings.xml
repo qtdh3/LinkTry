@@ -5,5 +5,7 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="hint_button">Hint</string>
-	<string name="reset_button">ResetMatrix</string>
+	<string name="reset_button">Reset</string>
+	<string name="pause_button">Pause</string>
+	<string name="count_tv">已消除 0 对</string>
 </resources>

@@ -38,7 +38,7 @@
 	        android:layout_height="match_parent"
 	        android:orientation="vertical"
 	        android:gravity="center_horizontal"
-	        android:background="#f019cc" 
+	        android:background="#ccffff00"
 	        >
 	          
 	        
@@ -65,11 +65,47 @@
 
             <Button
                 android:id="@+id/reset_Button"
-                style="?metaButtonBarButtonStyle"
+                style="@android:style/ButtonBar"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/reset_button" />
+            <Button
+                android:id="@+id/pause_Button"
+                style="@android:style/ButtonBar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/pause_button" />
+            <LinearLayout 
+	            android:layout_width="0dp"
+	            android:layout_height="wrap_content"
+	            android:layout_weight="2"
+	            android:gravity="center_horizontal"
+	            android:background="@color/black_overlay"
+	            android:orientation="vertical"
+	            tools:ignore="UselessParent"
+                >
+                <TextView 
+                    android:id="@+id/time_textview"
+                    android:layout_width="wrap_content"
+           			android:layout_height="wrap_content"
+           			android:padding="3dp"
+           			android:gravity="center"
+           			android:textSize="18sp"
+           			android:text="0 s"
+                    />
+                <TextView 
+                    android:id="@+id/count_textview"
+                    android:layout_width="match_parent"
+           			android:layout_height="wrap_content"
+           			android:padding="3dp"
+           			android:gravity="center"
+           			android:textSize="18sp"
+           			android:text="@string/count_tv"
+                    />
+                
+            </LinearLayout>
         </LinearLayout>
     </FrameLayout>
 

@@ -1,5 +1,8 @@
 package com.ljf.linktry;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import com.ljf.linktry.util.SystemUiHider;
 
 import android.app.Activity;
@@ -11,6 +14,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.text.format.Time;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -23,6 +27,8 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -33,10 +39,19 @@ import android.widget.TableRow;
 public class FullscreenActivity extends Activity {
 	private int[] lastBlockPos = null;
 	private int[] lastBlockPosReal = null;
-	private Judgement judgement = null;
 	private int[] LeftRightPosReal = null;
+	private final int[] INITMATRIXLENGTH=new int[]{8,8};
+	private final int INITMATRIXPAIRS=INITMATRIXLENGTH[0]*INITMATRIXLENGTH[1]/2;
+	private int time_show=0;
+	private Judgement judgement = null;
+	
+	
 	private int blockLinesLength;
 	private MediaPlayer mediaPlayer;
+	private TimerTask showTimerTask;
+	
+	private TextView timeTextView,countTextView;
+	protected int pair_success_count=0;
 	
 	private static final int STYLENUM=16;
 	private static final String Tag = "MainActivity";
@@ -44,12 +59,33 @@ public class FullscreenActivity extends Activity {
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
-
-		Log.d(Tag, "onWindowFocusChanged");
+		String string=hasFocus?"get":"lose";
+		Log.i(Tag, "onWindowFocusChanged: "+string);
+		Timer showTimeTimer= new Timer();
+		showTimerTask=new TimerTask() {
+			
+			@Override
+			public void run() {
+				timeTextView.post(new Runnable() {
+					@Override
+					public void run() {
+						timeTextView.setText(time_show+" s");
+					}
+				});
+				
+				if (time_show<240) {
+					time_show++;
+				}else {
+					time_show=0;
+				}
+				
+			}
+		};
 		
 		if (hasFocus) {
 			setOriginalCoordinate();
 			mediaPlayer=MediaPlayer.create(FullscreenActivity.this, R.raw.ding);
+			showTimeTimer.schedule(showTimerTask, 500, 1000);
 		}else {
 			mediaPlayer.release();
 			mediaPlayer=null;
@@ -63,7 +99,7 @@ public class FullscreenActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		final LinearLayout main_Layout = (LinearLayout) findViewById(R.id.main_page_part);
 
-		int[][] TestArray = RandomInit.twoDimenArray(8, 8, STYLENUM);
+		int[][] TestArray = RandomInit.twoDimenArray(INITMATRIXLENGTH[0], INITMATRIXLENGTH[1], STYLENUM);
 		judgement = new Judgement(TestArray,16);
 		TableLayout tableLayout = initBlocksView(TestArray);
 		main_Layout.addView(tableLayout);
@@ -72,7 +108,7 @@ public class FullscreenActivity extends Activity {
 		hintButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Log.d(Tag, "hintButton Pressed");
+				Log.d(Tag, "hintButton Pressed");			
 				int[] checkResult=null;
 				try {
 					checkResult = judgement.checkForPairs();
@@ -118,10 +154,12 @@ public class FullscreenActivity extends Activity {
 				main_Layout.addView(haveResettableLayout, 0);
 			}
 		});
+		
+		timeTextView=(TextView) findViewById(R.id.time_textview);
+		countTextView=(TextView) findViewById(R.id.count_textview);
 	}
 
 	private View.OnClickListener blocks_onClickListener = new OnClickListener() {
-
 		@Override
 		public void onClick(View v) {
 			int btnId = v.getId();
@@ -129,7 +167,6 @@ public class FullscreenActivity extends Activity {
 			final int[] blockPosNow = new int[2];
 			blockPosNow[0] = btnId / 100;
 			blockPosNow[1] = btnId % 100;
-
 			if (LeftRightPosReal == null) {
 				setOriginalCoordinate();
 			}
@@ -153,6 +190,7 @@ public class FullscreenActivity extends Activity {
 										blockPosNow);
 								int[] pathArray = judgement.pathPosArray;
 								FrameLayout frameLayout = (FrameLayout) findViewById(R.id.framelayoutinside);
+								
 								Thread thread= new Thread(new Runnable() {
 									
 									@Override
@@ -162,7 +200,6 @@ public class FullscreenActivity extends Activity {
 										} catch (Exception e) {
 											e.printStackTrace();
 										}
-										
 									}
 								});
 								thread.start();
@@ -183,6 +220,12 @@ public class FullscreenActivity extends Activity {
 									myView.setPosArray(lastBlockPosReal,
 											PosAtParentCor, pathArray);
 									frameLayout.addView(myView);
+									pair_success_count++;
+									countTextView.setText("已消除 "
+											+pair_success_count+ " 对");
+									if (pair_success_count>=INITMATRIXPAIRS) {
+										gameIsOver();
+									}
 								} catch (IllegalArgumentException e) {
 									e.printStackTrace();
 								}
@@ -204,6 +247,11 @@ public class FullscreenActivity extends Activity {
 				lastBlockPosReal = PosAtParentCor;
 			}
 
+		}
+
+		private void gameIsOver() {
+			Toast.makeText(FullscreenActivity.this, "You have eliminated all the squares", Toast.LENGTH_LONG).show();
+			showTimerTask.cancel();
 		}
 
 	};
