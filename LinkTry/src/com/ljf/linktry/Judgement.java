@@ -66,16 +66,16 @@ public class Judgement {
 					}
 				}
 			}
-			Log.e(Tag, "count="+count);
+			Log.d(Tag, "count="+count);
 			if (count%2!=0) {
 				throw new IllegalStateException("block Number must be paired");
 			}
 			
 			for (int i = 0; i < count-1; i++) {
 				for (int j = i+1; j < count; j++) {
-					Log.e(Tag, "check for point:"+i+","+j);
+					Log.d(Tag, "check for point:"+i+","+j);
 					if (judge(testPosArray[i], testPosArray[j])) {
-						Log.e(Tag, "checkPairs success");
+						Log.d(Tag, "checkPairs success");
 						return new int[]{testPosArray[i][0],testPosArray[i][1],testPosArray[j][0],testPosArray[j][1],pathPosArray[pathPosArray.length-1]};	
 					}
 				}
@@ -108,36 +108,36 @@ public class Judgement {
 		if (blockPos1[0] == blockPos2[0] || blockPos1[1] == blockPos2[1]) {
 			if (judgeLineClear(blockPos1, blockPos2)) {
 				pathPosArray = new int[] { LinkType1 };
-				Log.e(Tag, "Finish judging-- " + "Case1:--pathPosArray.length="
+				Log.d(Tag, "Finish judging-- " + "Case1:--pathPosArray.length="
 						+ pathPosArray.length);
 				return true;
 			} else {
 				if (judgeTwoPointCase(blockPos1, blockPos2)) {
-					Log.e(Tag, "Finish judging-- " + "Case3:" + pathPosArray[0]
+					Log.d(Tag, "Finish judging-- " + "Case3:" + pathPosArray[0]
 							+ "," + pathPosArray[1] + " " + pathPosArray[2]
 							+ "," + pathPosArray[3]);
 					return true;
 				} else {
 					pathPosArray = new int[] { LinkTypeFail };
-					Log.e(Tag, "Finish judging-- " + "Case0:--Failed");
+					Log.d(Tag, "Finish judging-- " + "Case0:--Failed");
 					return false;
 				}
 			}
 		} else if (judgeOnePointCase(blockPos1, blockPos2)) {
 			pathPosArray = new int[] { pathPosArray[0], pathPosArray[1],
 					LinkType2 };
-			Log.e(Tag, "Finish judging-- " + "Case2:" + pathPosArray[0] + ","
+			Log.d(Tag, "Finish judging-- " + "Case2:" + pathPosArray[0] + ","
 					+ pathPosArray[1]);
 			return true;
 		} else {
 			if (judgeTwoPointCase(blockPos1, blockPos2)) {
-				Log.e(Tag, "Finish judging-- " + "Case3:" + pathPosArray[0]
+				Log.d(Tag, "Finish judging-- " + "Case3:" + pathPosArray[0]
 						+ "," + pathPosArray[1] + " " + pathPosArray[2] + ","
 						+ pathPosArray[3]);
 				return true;
 			} else {
 				pathPosArray = new int[] { LinkTypeFail };
-				Log.e(Tag, "Finish judging-- " + "Case0:--Failed");
+				Log.d(Tag, "Finish judging-- " + "Case0:--Failed");
 				return false;
 			}
 		}
@@ -381,7 +381,7 @@ public class Judgement {
 //				sb.append("  ");
 //			}
 //		}
-//		Log.e(Tag, hintString + "  ArrayPrint:" + sb.toString());
+//		Log.d(Tag, hintString + "  ArrayPrint:" + sb.toString());
 //	}
 
 	private boolean isEmpty(int[] testPoint) {

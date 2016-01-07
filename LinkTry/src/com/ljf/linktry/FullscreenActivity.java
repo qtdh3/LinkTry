@@ -1,6 +1,7 @@
 package com.ljf.linktry;
 
 import com.ljf.linktry.util.SystemUiHider;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.graphics.Color;
@@ -9,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.StateListDrawable;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -70,6 +72,8 @@ public class FullscreenActivity extends Activity {
 	private int[] LeftRightPosReal = null;
 	private int blockLinesLength;
 
+	private MediaPlayer mediaPlayer;
+
 //	private static final int TABLEVIEWIDNUM=314758;
 
 	private static final int STYLENUM=16;
@@ -80,9 +84,18 @@ public class FullscreenActivity extends Activity {
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
 
-		Log.e(Tag, "onWindowFocusChanged");
+		Log.d(Tag, "onWindowFocusChanged");
 		
-		setOriginalCoordinate();
+		if (hasFocus) {
+			setOriginalCoordinate();
+			mediaPlayer=MediaPlayer.create(FullscreenActivity.this, R.raw.ding);
+		}else {
+			mediaPlayer.release();
+			mediaPlayer=null;
+		}
+		
+		
+		
 		
 		/*Display display = getWindowManager().getDefaultDisplay();
 		Point outSize = new Point();
@@ -95,18 +108,25 @@ public class FullscreenActivity extends Activity {
 		Rect drawRect = new Rect();
 		getWindow().getDecorView().findViewById(Window.ID_ANDROID_CONTENT)
 				.getDrawingRect(drawRect);
-		Log.e(Tag,
+		Log.d(Tag,
 				"Window.ID_ANDROID_CONTENT："
 						+ getWindow().getDecorView().findViewById(
 								Window.ID_ANDROID_CONTENT));
 		int top = getWindow().getDecorView()
 				.findViewById(Window.ID_ANDROID_CONTENT).getTop();
-		Log.e(Tag,
+		Log.d(Tag,
 				"Screen Height=" + outSize.y + ";stateBarHeit=" + stateBarHeit
 						+ ";noStateBarRect.height=" + noStateBarRect.height()
 						+ ";\ndrawRect.top=" + top + ";drawRect.height"
 						+ drawRect.height());*/
 	}
+	
+//	@Override
+//	protected void onDestroy() {
+//		// TODO Auto-generated method stub
+//		super.onDestroy();
+//		mediaPlayer=null;
+//	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -198,7 +218,7 @@ public class FullscreenActivity extends Activity {
 		hintButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Log.e(Tag, "hintButton Pressed");
+				Log.d(Tag, "hintButton Pressed");
 				int[] checkResult=null;
 				try {
 					checkResult = judgement.checkForPairs();
@@ -208,7 +228,7 @@ public class FullscreenActivity extends Activity {
 					e.printStackTrace();
 				}
 				if (checkResult.length<4) {
-					Log.e(Tag, "没有匹配的结果，需要重新调整阵列");
+					Log.d(Tag, "没有匹配的结果，需要重新调整阵列");
 				}else {
 					for (int i = 0; i < 4; i++) {
 						checkResult[i] = (checkResult[i])
@@ -238,7 +258,7 @@ public class FullscreenActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				Log.e(Tag, "resetButton Pressed");
+				Log.d(Tag, "resetButton Pressed");
 				int[][] haveResetArray= RandomInit.adjustRestMatrix(judgement.getSmallArray(),STYLENUM);
 				judgement=new Judgement(haveResetArray, STYLENUM);
 				TableLayout haveResettableLayout= initBlocksView(haveResetArray);
@@ -247,6 +267,8 @@ public class FullscreenActivity extends Activity {
 			}
 		});
 		main_Layout.addView(resetButton);
+		
+//		mediaPlayer=MediaPlayer.create(FullscreenActivity.this, R.raw.ding);
 
 		/*TextView textView = new TextView(this);
 		LinearLayout.LayoutParams lP = new LinearLayout.LayoutParams(-1, 400);
@@ -262,12 +284,12 @@ public class FullscreenActivity extends Activity {
 		main_Layout.addView(textView);*/
 	}
 
-	private View.OnClickListener onClickListener = new OnClickListener() {
+	private View.OnClickListener blocks_onClickListener = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
 			int btnId = v.getId();
-//			Log.e(Tag, "onClickListener:" + btnId);
+//			Log.d(Tag, "onClickListener:" + btnId);
 			// get the matrix simple coordinate
 			final int[] blockPosNow = new int[2];
 			blockPosNow[0] = btnId / 100;
@@ -282,7 +304,7 @@ public class FullscreenActivity extends Activity {
 			PosAtParentCor[1] = ((View) v.getParent()).getTop();
 			PosAtParentCor[0] += blockLinesLength / 2 + MARGINS_LEFT;
 			PosAtParentCor[1] += blockLinesLength / 2 + MARGINS_TOP;
-//			Log.e(Tag, "LocationInCanvas:" + PosAtParentCor[0] + ","
+//			Log.d(Tag, "LocationInCanvas:" + PosAtParentCor[0] + ","
 //					+ PosAtParentCor[1]);
 
 			boolean isRight = false;
@@ -291,13 +313,29 @@ public class FullscreenActivity extends Activity {
 						|| lastBlockPos[1] != blockPosNow[1]) {
 					try {
 						if (judgement.judge(lastBlockPos, blockPosNow)) {
-//							Log.e(Tag, "路径判断结果为--成立");
+//							Log.d(Tag, "路径判断结果为--成立");
 							if (judgement.judgeStyle(lastBlockPos, blockPosNow)) {
-//								Log.e(Tag, "样式判断结果为--成立");
+//								Log.d(Tag, "样式判断结果为--成立");
 								judgement.removeBlocks(lastBlockPos,
 										blockPosNow);
 								int[] pathArray = judgement.pathPosArray;
 								FrameLayout frameLayout = (FrameLayout) findViewById(R.id.framelayoutinside);
+								Thread thread= new Thread(new Runnable() {
+									
+									@Override
+									public void run() {
+										try {
+//											MediaPlayer mediaPlayer=MediaPlayer.create(FullscreenActivity.this, R.raw.ding);
+											mediaPlayer.start();
+										} catch (Exception e) {
+											e.printStackTrace();
+										}
+										
+									}
+								});
+								thread.start();
+								
+								
 								try {
 									// change simple matrix coordinate into
 									// canvas coordinate
@@ -365,7 +403,7 @@ public class FullscreenActivity extends Activity {
 //				findViewById(blockPosNow[0] * 100 + blockPosNow[1]).setAlpha(0);
 				final FrameLayout frameLayout = (FrameLayout) findViewById(R.id.framelayoutinside);
 				int childViewCount=frameLayout.getChildCount();
-				Log.e(Tag, "childViewCount="+childViewCount);
+				Log.d(Tag, "childViewCount="+childViewCount);
 				Animation animation=AnimationUtils.loadAnimation(FullscreenActivity.this, R.anim.disappear);
 				animation.setFillAfter(true);
 				final View shouRemoveView;
@@ -375,7 +413,7 @@ public class FullscreenActivity extends Activity {
 //				}else {
 					shouRemoveView=frameLayout.getChildAt(childViewCount - 1);
 					shouRemoveView.startAnimation(animation);
-					Log.e(Tag, "shouRemoveView"+shouRemoveView);
+					Log.d(Tag, "shouRemoveView"+shouRemoveView);
 //				}
 				findViewById(100 * lastBlockPos[0] + lastBlockPos[1]).startAnimation(animation);
 				findViewById(blockPosNow[0] * 100 + blockPosNow[1]).startAnimation(animation);
@@ -515,7 +553,7 @@ public class FullscreenActivity extends Activity {
 					button.setBackgroundDrawable(stateListDrawable);
 					// button.setBackgroundColor(color);
 					button.setId((j - 1) * 100 + i - 1);
-					button.setOnClickListener(onClickListener);
+					button.setOnClickListener(blocks_onClickListener);
 //					button.setAlpha(1);
 				}
 				tableRow.addView(button);
