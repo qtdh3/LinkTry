@@ -220,15 +220,43 @@ public class FullscreenActivity extends Activity {
 									myView.setPosArray(lastBlockPosReal,
 											PosAtParentCor, pathArray);
 									frameLayout.addView(myView);
-									pair_success_count++;
-									countTextView.setText("已消除 "
-											+pair_success_count+ " 对");
-									if (pair_success_count>=INITMATRIXPAIRS) {
-										gameIsOver();
-									}
 								} catch (IllegalArgumentException e) {
 									e.printStackTrace();
 								}
+								
+								int[] checkResult=null;
+								boolean haveCheckPass=false;
+								
+								pair_success_count++;
+								countTextView.setText("已消除 "
+										+pair_success_count+ " 对");
+								if (pair_success_count>=INITMATRIXPAIRS) {
+									gameIsOver();
+									haveCheckPass=true;
+								}
+								
+								while (!haveCheckPass) {
+									try {
+										checkResult = judgement.checkForPairs();
+									} catch(IllegalStateException exception){
+										exception.printStackTrace();
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
+									if (checkResult.length<4) {
+										Log.d(Tag, "没有匹配的结果，需要重新调整阵列");
+										int[][] haveResetArray= RandomInit.adjustRestMatrix(judgement.getSmallArray(),STYLENUM);
+										judgement=new Judgement(haveResetArray, STYLENUM);
+										TableLayout haveResettableLayout= initBlocksView(haveResetArray);
+										LinearLayout main_Layout = (LinearLayout) findViewById(R.id.main_page_part);
+										main_Layout.removeViewAt(0);
+										main_Layout.addView(haveResettableLayout, 0);
+									}
+									else {
+										haveCheckPass=true;
+									}
+								}
+								
 
 								final int[] lastBlockPosCopy = lastBlockPos;
 								removeBlockAndLine(lastBlockPosCopy,blockPosNow);

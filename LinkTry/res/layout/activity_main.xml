@@ -59,7 +59,7 @@
                 android:id="@+id/hint_button"
                 style="@android:style/ButtonBar"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="@string/hint_button" />
 
@@ -67,14 +67,14 @@
                 android:id="@+id/reset_Button"
                 style="@android:style/ButtonBar"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="@string/reset_button" />
             <Button
                 android:id="@+id/pause_Button"
                 style="@android:style/ButtonBar"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="@string/pause_button" />
             <LinearLayout 
