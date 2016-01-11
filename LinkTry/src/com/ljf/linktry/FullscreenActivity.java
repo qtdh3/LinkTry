@@ -49,6 +49,8 @@ public class FullscreenActivity extends Activity {
 	private int blockLinesLength;
 	private MediaPlayer mediaPlayer;
 	private TimerTask showTimerTask;
+	private Timer showTimeTimer;
+	private boolean isWait=false;
 	
 	private TextView timeTextView,countTextView;
 	protected int pair_success_count=0;
@@ -61,34 +63,52 @@ public class FullscreenActivity extends Activity {
 		super.onWindowFocusChanged(hasFocus);
 		String string=hasFocus?"get":"lose";
 		Log.i(Tag, "onWindowFocusChanged: "+string);
-		Timer showTimeTimer= new Timer();
-		showTimerTask=new TimerTask() {
-			
-			@Override
-			public void run() {
-				timeTextView.post(new Runnable() {
-					@Override
-					public void run() {
-						timeTextView.setText(time_show+" s");
-					}
-				});
-				
-				if (time_show<240) {
-					time_show++;
-				}else {
-					time_show=0;
-				}
-				
-			}
-		};
+//		showTimeTimer= new Timer();
+		
 		
 		if (hasFocus) {
 			setOriginalCoordinate();
 			mediaPlayer=MediaPlayer.create(FullscreenActivity.this, R.raw.ding);
-			showTimeTimer.schedule(showTimerTask, 500, 1000);
+//			if (isWait) {
+				showTimeTimer=new Timer();
+				showTimerTask=new TimerTask() {
+					
+					@Override
+					public void run() {
+						timeTextView.post(new Runnable() {
+							@Override
+							public void run() {
+								timeTextView.setText(time_show+" s");
+							}
+						});
+						
+						if (time_show<240) {
+							time_show++;
+						}else {
+							time_show=0;
+						}
+					}
+				};
+				showTimeTimer.schedule(showTimerTask, 500, 1000);
+				isWait=false;
+//			}
+			
 		}else {
 			mediaPlayer.release();
 			mediaPlayer=null;
+			Log.d(Tag, "showTimerTask.cancel()-->"+showTimerTask.cancel());
+			isWait=true;
+//			try {
+//				synchronized (showTimerTask) {
+//					showTimerTask.wait();
+//					isWait=true;
+//				}
+//				
+//				
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 		}
 	}
 	
@@ -157,6 +177,8 @@ public class FullscreenActivity extends Activity {
 		
 		timeTextView=(TextView) findViewById(R.id.time_textview);
 		countTextView=(TextView) findViewById(R.id.count_textview);
+		
+		showTimeTimer= new Timer();
 	}
 
 	private View.OnClickListener blocks_onClickListener = new OnClickListener() {
