@@ -2,8 +2,6 @@ package com.ljf.linktry;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import android.R.integer;
 import android.util.Log;
 
 public class RandomInit {
