@@ -1,11 +1,15 @@
 package com.ljf.linktry;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import com.ljf.linktry.util.SystemUiHider;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Fragment;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -350,6 +354,7 @@ public class FullscreenActivity extends Activity {
 		blockLinesLength = firstButtonView.getWidth();
 	}
 
+	@SuppressLint("NewApi")
 	@SuppressWarnings("deprecation")
 	private TableLayout initBlocksView(int[][] testArray) {
 		int x_dimen, y_dimen;
@@ -361,6 +366,16 @@ public class FullscreenActivity extends Activity {
 		getWindowManager().getDefaultDisplay().getMetrics(DM);
 		int x_pixel = DM.widthPixels;
 		int x_per = x_pixel / x_dimen;
+		
+		List<Integer> picIdlList=new ArrayList<Integer>();
+		picIdlList.add(R.drawable.psb01);
+		picIdlList.add(R.drawable.psb02);
+		picIdlList.add(R.drawable.psb03);
+		picIdlList.add(R.drawable.psb04);
+		picIdlList.add(R.drawable.psb05_rec);
+		picIdlList.add(R.drawable.psb08);
+		picIdlList.add(R.drawable.pic06);
+		
 		for (int i = 0; i < y_dimen; i++) {
 
 			TableRow tableRow = new TableRow(this);
@@ -388,69 +403,72 @@ public class FullscreenActivity extends Activity {
 					button.setAlpha(invisible);
 					button.setBackgroundColor(0xff99cc00);
 				} else {
-					int color = Color.GREEN;
+//					int color = Color.GREEN;
+					Integer picIdiInteger=picIdlList.get(0);
 					switch (testArray[j - 1][i - 1]) {
 					case 1:
-						color = Color.BLUE;
+						picIdiInteger=picIdlList.get(0);
 						break;
 					case 2:
-						color = Color.CYAN;
+						picIdiInteger=picIdlList.get(6);
 						break;
 					case 3:
-						color = Color.DKGRAY;
+						picIdiInteger=picIdlList.get(4);
 						break;
 					case 4:
-						color = Color.LTGRAY;
+						picIdiInteger=picIdlList.get(4);
 						break;
 					case 5:
-						color = Color.MAGENTA;
+						picIdiInteger=picIdlList.get(1);
 						break;
 					case 6:
-						color = Color.RED;
+						picIdiInteger=picIdlList.get(5);
 						break;
 					case 7:
-						color = Color.GREEN;
+						picIdiInteger=picIdlList.get(1);
 						break;
 					case 8:
-						color = Color.BLACK;
+						picIdiInteger=picIdlList.get(5);
 						break;
 					case 9:
-						color = Color.GRAY;
+						picIdiInteger=picIdlList.get(2);
 						break;
 					case 10:
-						color = 0xFF13579b;
+						picIdiInteger=picIdlList.get(6);
 						break;
 					case 11:
-						color = Color.WHITE;
+						picIdiInteger=picIdlList.get(4);
 						break;
 					case 12:
-						color = Color.YELLOW;
+						picIdiInteger=picIdlList.get(2);
 						break;
 					case 13:
-						color = com.ljf.linktry.R.color.black_overlay;
+						picIdiInteger=picIdlList.get(3);
 						break;
 					case 14:
-						color = 0xFFdd7711;
+						picIdiInteger=picIdlList.get(5);
 						break;
 					case 15:
-						color = 0xFF336699;
+						picIdiInteger=picIdlList.get(3);
 						break;
 					case 16:
-						color = 0xFFb91357;
+						picIdiInteger=picIdlList.get(5);
 						break;
 
 					default:                    // inclue the case 0:
-						color = Color.TRANSPARENT;
+						picIdiInteger=picIdlList.get(0);
 //						button.setAlpha(invisible);
 						button.setAlpha(0f);
 						break;
 					}
-					// drawable=getResources().getDrawable(R.drawable.ic_launcher);
-					ColorDrawable colorDrawable = new ColorDrawable(color);
+					 Drawable drawable = getResources().getDrawable(picIdiInteger);
+					 
+//					ColorDrawable colorDrawable = new ColorDrawable(color);
 					stateListDrawable.addState(
 							new int[] { -android.R.attr.state_pressed },
-							colorDrawable);
-					button.setBackgroundDrawable(stateListDrawable);
+							drawable);
+					button.setBackground(stateListDrawable);
+//					button.setBackgroundDrawable(stateListDrawable);
 					// button.setBackgroundColor(color);
 					button.setId((j - 1) * 100 + i - 1);
 					button.setOnClickListener(blocks_onClickListener);
@@ -472,8 +490,8 @@ public class FullscreenActivity extends Activity {
 		// lParams.gravity=Gravity.CENTER; //代码的优先级高于 xml文件
 		lParams.setMargins(MARGINS_LEFT, MARGINS_TOP, 5, 5);
 		tableLayout.setLayoutParams(lParams);
-		tableLayout.setBackgroundColor(getResources().getColor(
-				com.ljf.linktry.R.color.holo_green_light));
+//		tableLayout.setBackgroundColor(getResources().getColor(
+//				com.ljf.linktry.R.color.holo_green_light));
 
 		return tableLayout;
 	}
